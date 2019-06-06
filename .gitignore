@@ -105,3 +105,4 @@ venv.bak/
 
 # Javascript
 node_modules/
+frontend/static/frontend/preprocessed
