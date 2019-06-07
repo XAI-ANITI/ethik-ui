@@ -1,8 +1,10 @@
 import React from "react";
 
+import DatasetLoader from "./DatasetLoader";
+
 function App() {
   return (
-    <h1>Hello Ethik</h1>
+    <DatasetLoader endpoint="loadDataset" mimeTypes={["text/csv"]} />
   );
 }
 
