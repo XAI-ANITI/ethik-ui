@@ -25,10 +25,12 @@ class DatasetLoader extends Component {
 
     API.post(this.props.endpoint, form)
     .then(function (res) {
+      // TODO
       console.log(res);
     })
     .catch(function (e) {
-      alert("Error submitting form!" + e.status);
+      // TODO
+      alert("Error submitting form! " + e);
     });
   }
 
