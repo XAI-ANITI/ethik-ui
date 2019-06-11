@@ -1,8 +1,10 @@
 import React, { Component } from "react";
 import Dropzone from "react-dropzone";
 import PropTypes from "prop-types";
+import { connect } from 'react-redux'
 
 import API from "../api";
+import { loadMeanExplanation } from '../redux/actions'
 
 class DatasetLoader extends Component {
   static propTypes = {
@@ -20,13 +22,13 @@ class DatasetLoader extends Component {
   }
 
   onDropAccepted = (files) => {
+    const loadMeanExplanation = this.props.loadMeanExplanation;
     const form = new FormData();
     form.append("file", files[0]);
 
     API.post(this.props.endpoint, form)
     .then(function (res) {
-      // TODO
-      console.log(res);
+      loadMeanExplanation(res.data.taus, res.data.means, res.data.accuracies);
     })
     .catch(function (e) {
       // TODO
@@ -67,4 +69,7 @@ class DatasetLoader extends Component {
   }
 }
 
-export default DatasetLoader;
+export default connect(
+  null,
+  { loadMeanExplanation }
+)(DatasetLoader)

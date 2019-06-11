@@ -15,15 +15,14 @@ def load_dataset(request):
     except ValueError as e:
         return HttpResponseBadRequest(e)
 
-    X = data.iloc[:,:-1].values
-    y = data.iloc[:,-1].values
+    X = data.iloc[:,:-1]
+    y = data.iloc[:,-1]
 
-    explainer = ethik.Explainer()
-    explainer.fit(X)
+    explainer = ethik.Explainer().fit(X)
     explanation = explainer.explain_predictions(X, y)
-    explanation.columns = data.columns[:-1]
 
     return JsonResponse(dict(
         taus=explanation.index.values.tolist(),
-        means=explanation.to_dict("list"),
+        means=explainer.nominal_values(X).to_dict("list"),
+        accuracies=explanation.to_dict("list"),
     ))

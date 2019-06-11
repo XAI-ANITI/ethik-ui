@@ -1,10 +1,14 @@
 import React from "react";
 
 import DatasetLoader from "./DatasetLoader";
+import DisplayMeanExplanation from "./DisplayMeanExplanation";
 
 function App() {
   return (
-    <DatasetLoader endpoint="loadDataset" mimeTypes={["text/csv"]} />
+    <div>
+      <DatasetLoader endpoint="loadDataset" mimeTypes={["text/csv"]} />
+      <DisplayMeanExplanation />
+    </div>
   );
 }
 
