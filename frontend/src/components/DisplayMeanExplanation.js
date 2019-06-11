@@ -1,10 +1,14 @@
 import React from "react";
 import { connect } from "react-redux";
 
-import { getTaus } from "../redux/selectors";
+import { getTaus } from "../redux/mean_explainer/selectors";
 
 function DisplayMeanExplanation(props) {
-  return props.taus.join(", ");
+  return (
+    <div>
+      {props.taus.join(", ")}
+    </div>
+  );
 }
 
 export default connect(

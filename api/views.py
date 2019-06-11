@@ -4,7 +4,7 @@ import ethik
 from .readers import read_ds
 
 
-def load_dataset(request):
+def explain_with_mean(request):
     try:
         f = request.FILES["file"]
     except KeyError:
