@@ -4,6 +4,7 @@ import LoadDataset from "./LoadDataset";
 import DisplayDataset from "./DisplayDataset";
 import ExplainWithMean from "./ExplainWithMean";
 import DisplayMeanExplanation from "./DisplayMeanExplanation";
+import PlotMeanExplanation from "./PlotMeanExplanation";
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
       <DisplayDataset />
       <ExplainWithMean endpoint="explain_with_mean" />
       <DisplayMeanExplanation />
+      <PlotMeanExplanation />
     </div>
   );
 }

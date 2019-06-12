@@ -30,7 +30,8 @@ class ExplainWithMean extends Component {
       this_.props.explain({
         taus: res.data.taus,
         means: res.data.means,
-        accuracies: res.data.accuracies
+        accuracies: res.data.accuracies,
+        features: Object.keys(res.data.accuracies),
       });
       this_.setState(state => ({
         loading: false

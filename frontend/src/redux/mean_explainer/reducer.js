@@ -4,18 +4,26 @@ import Immutable from "immutable";
 import MeanExplanation from "./record";
 
 export const explain = createAction("MEAN_EXPLAINER/EXPLAIN");
+export const selectFeature = createAction("MEAN_EXPLAINER/SELECT_FEATURE");
 
-const INITIAL_STATE = new MeanExplanation();
+const INITIAL_STATE = new Immutable.Record({
+  explanation: new MeanExplanation(),
+  selectedFeature: "",
+});
 
 const MeanExplainerReducer = handleActions(
   {
     [explain]: (state, { payload }) => {
-      return state.set("taus", Immutable.fromJS(payload.taus))
-        .set("means", Immutable.fromJS(payload.means))
-        .set("accuracies", Immutable.fromJS(payload.accuracies));
-    }
+      const explanation = new MeanExplanation(Immutable.fromJS(payload));
+      state = state.set("explanation", explanation);
+      return handleFeatureSelection(state, explanation.features.get(0));
+    },
+    [selectFeature]: (state, { payload }) =>
+      handleFeatureSelection(state, payload.feature),
   },
-  INITIAL_STATE
+  INITIAL_STATE()
 );
+
+const handleFeatureSelection = (state, feature) => state.set("selectedFeature", feature);
 
 export default MeanExplainerReducer;
