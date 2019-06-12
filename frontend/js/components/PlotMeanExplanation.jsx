@@ -22,11 +22,14 @@ function PlotMeanExplanation(props) {
           }
         ]}
         layout={{
+          margin: { t: 50 },
           xaxis: {
-            title: `${props.selectedFeature} (mean)`
+            title: `Mean ${props.selectedFeature} of the dataset`,
           },
           yaxis: {
             title: "Accuracy",
+            range: [0, 1],
+            showline: true,
           }
         }}
       />

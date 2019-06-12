@@ -1,3 +1,5 @@
+require("../../sass/main.scss");
+
 import React from "react";
 
 import LoadDataset from "./LoadDataset";
