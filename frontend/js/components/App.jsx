@@ -10,7 +10,7 @@ import PlotMeanExplanation from "./PlotMeanExplanation";
 
 function App() {
   return (
-    <div>
+    <div id="app">
       <LoadDataset mimeTypes={["text/csv"]} />
       <DisplayDataset />
       <ExplainWithMean endpoint="explain_with_mean" />

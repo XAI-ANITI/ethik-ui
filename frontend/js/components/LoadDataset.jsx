@@ -1,9 +1,12 @@
+require("../../sass/LoadDataset.scss");
+
 import React, { Component } from "react";
 import Dropzone from "react-dropzone";
 import PropTypes from "prop-types";
 import { connect } from 'react-redux'
 
 import { load as loadDataset } from "../redux/dataset/reducer"
+import { getName as getDatasetName } from "../redux/dataset/selectors"
 
 class LoadDataset extends Component {
   static propTypes = {
@@ -25,6 +28,10 @@ class LoadDataset extends Component {
   }
 
   render() {
+    if (this.props.isDatasetLoaded) {
+      return null;
+    }
+
     const accept = this.props.mimeTypes ? this.props.mimeTypes.join(", ") : null;
 
     return (
@@ -35,7 +42,7 @@ class LoadDataset extends Component {
         multiple={false}
       >
         {({getRootProps, getInputProps}) => (
-          <section className="container">
+          <section className="dropzone-container">
             <div {...getRootProps({className: "dropzone"})}>
               <input {...getInputProps()} />
               <p>Drag 'n' drop some files here, or click to select files</p>
@@ -48,6 +55,6 @@ class LoadDataset extends Component {
 }
 
 export default connect(
-  null,
+  state => ({ isDatasetLoaded: getDatasetName(state) != "" }),
   { loadDataset }
 )(LoadDataset)

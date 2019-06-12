@@ -6,7 +6,7 @@ import store from "./redux/store"
 
 import App from "./components/App";
 
-const wrapper = document.getElementById("app");
+const wrapper = document.getElementById("root");
 ReactDOM.render(
   <Provider store={store}>
     <App />

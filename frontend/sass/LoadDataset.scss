@@ -1,0 +1,20 @@
+.dropzone-container {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  .dropzone {
+    cursor: pointer;
+    background: #fafafa;
+    border: 2px dashed #eeeeee;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    width: 50%;
+    height: 50%;
+  }
+}
