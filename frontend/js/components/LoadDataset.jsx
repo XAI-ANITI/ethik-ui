@@ -3,14 +3,17 @@ require("../../sass/LoadDataset.scss");
 import React, { Component } from "react";
 import Dropzone from "react-dropzone";
 import PropTypes from "prop-types";
-import { connect } from 'react-redux'
+import { connect } from "react-redux";
 
 import { load as loadDataset } from "../redux/dataset/reducer"
-import { getName as getDatasetName } from "../redux/dataset/selectors"
 
 class LoadDataset extends Component {
   static propTypes = {
-    mimeTypes: PropTypes.arrayOf(PropTypes.string)
+    mimeTypes: PropTypes.arrayOf(PropTypes.string),
+    light: PropTypes.bool
+  };
+  static defaultProps = {
+    light: false,
   };
 
   constructor(props) {
@@ -28,11 +31,11 @@ class LoadDataset extends Component {
   }
 
   render() {
-    if (this.props.isDatasetLoaded) {
-      return null;
-    }
-
     const accept = this.props.mimeTypes ? this.props.mimeTypes.join(", ") : null;
+    let className = "dropzone-container";
+    if (this.props.light) {
+      className += " light";
+    }
 
     return (
       <Dropzone
@@ -42,10 +45,10 @@ class LoadDataset extends Component {
         multiple={false}
       >
         {({getRootProps, getInputProps}) => (
-          <section className="dropzone-container">
+          <section className={className}>
             <div {...getRootProps({className: "dropzone"})}>
               <input {...getInputProps()} />
-              <p>Drag 'n' drop some files here, or click to select files</p>
+              {this.props.children}
             </div>
           </section>
         )}
@@ -55,6 +58,6 @@ class LoadDataset extends Component {
 }
 
 export default connect(
-  state => ({ isDatasetLoaded: getDatasetName(state) != "" }),
+  null,
   { loadDataset }
-)(LoadDataset)
+)(LoadDataset);

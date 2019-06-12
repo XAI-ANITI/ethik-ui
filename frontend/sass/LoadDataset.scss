@@ -1,4 +1,8 @@
-.dropzone-container {
+.dropzone {
+  cursor: pointer;
+}
+
+.dropzone-container:not(.light) {
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -6,7 +10,6 @@
   align-items: center;
 
   .dropzone {
-    cursor: pointer;
     background: #fafafa;
     border: 2px dashed #eeeeee;
     display: flex;

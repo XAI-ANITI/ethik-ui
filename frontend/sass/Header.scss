@@ -1,0 +1,14 @@
+header {
+  padding: 20px;
+  border-bottom: 1px solid #000;
+  display: flex;
+
+  h1 {
+    margin: 0;
+  }
+
+  .dataset-wrapper {
+    flex: 1;
+    text-align: center;
+  }
+}

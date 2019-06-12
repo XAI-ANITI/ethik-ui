@@ -1,13 +1,13 @@
-import React, { Component } from "react";
+import React from "react";
 import { connect } from "react-redux"
 
 import { getName } from "../redux/dataset/selectors";
 
 function DisplayDataset(props) {
   return (
-    <div className="dataset">
+    <span>
       {props.name}
-    </div>
+    </span>
   );
 }
 
