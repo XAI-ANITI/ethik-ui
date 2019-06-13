@@ -5,6 +5,7 @@ import MeanExplanation from "./record";
 
 export const explain = createAction("MEAN_EXPLAINER/EXPLAIN");
 export const selectFeature = createAction("MEAN_EXPLAINER/SELECT_FEATURE");
+export const clear = createAction("MEAN_EXPLAINER/CLEAR");
 
 const INITIAL_STATE = new Immutable.Record({
   explanation: new MeanExplanation(),
@@ -20,6 +21,7 @@ const MeanExplainerReducer = handleActions(
     },
     [selectFeature]: (state, { payload }) =>
       handleFeatureSelection(state, payload.feature),
+    [clear]: (state, { payload }) => INITIAL_STATE(),
   },
   INITIAL_STATE()
 );

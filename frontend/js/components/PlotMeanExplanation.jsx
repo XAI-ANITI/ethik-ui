@@ -2,10 +2,10 @@ import React from "react";
 import { connect } from "react-redux";
 import Plot from "react-plotly.js";
 
-import { getTaus, getMeans, getAccuracies, getSelectedFeature } from "../redux/mean_explainer/selectors";
+import { isDatasetExplained, getTaus, getMeans, getAccuracies, getSelectedFeature } from "../redux/mean_explainer/selectors";
 
 function PlotMeanExplanation(props) {
-  if (!props.selectedFeature) {
+  if (!props.isDatasetExplained || !props.selectedFeature) {
     return null;
   }
   const means = props.means.get(props.selectedFeature).toJS();
@@ -39,6 +39,7 @@ function PlotMeanExplanation(props) {
 
 export default connect(
   state => ({
+    isDatasetExplained: isDatasetExplained(state),
     taus: getTaus(state),
     means: getMeans(state),
     accuracies: getAccuracies(state),
