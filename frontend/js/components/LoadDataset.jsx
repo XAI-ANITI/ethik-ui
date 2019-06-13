@@ -1,61 +1,54 @@
 require("../../sass/LoadDataset.scss");
 
-import React, { Component } from "react";
+import React, { useState } from "react";
 import Dropzone from "react-dropzone";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 
 import { load as loadDataset } from "../redux/dataset/reducer"
 
-class LoadDataset extends Component {
-  static propTypes = {
-    mimeTypes: PropTypes.arrayOf(PropTypes.string),
-    light: PropTypes.bool
-  };
-  static defaultProps = {
-    light: false,
-  };
+function LoadDataset(props) {
+  const [files, setFiles] = useState([]);
 
-  constructor(props) {
-    super(props);
-    this.state = { files: [] };
-  }
+  const onDrop = (files) => setFiles(files);
 
-  onDrop = (files) => {
-    this.setState({files});
-  }
-
-  onDropAccepted = (files) => {
+  const onDropAccepted = (files) => {
     const file = files[0];
-    this.props.loadDataset({ name: file.name, file: file });
+    props.loadDataset({ name: file.name, file: file });
   }
 
-  render() {
-    const accept = this.props.mimeTypes ? this.props.mimeTypes.join(", ") : null;
-    let className = "dropzone-container";
-    if (this.props.light) {
-      className += " light";
-    }
-
-    return (
-      <Dropzone
-        onDrop={this.onDrop}
-        onDropAccepted={this.onDropAccepted}
-        accept={accept}
-        multiple={false}
-      >
-        {({getRootProps, getInputProps}) => (
-          <section className={className}>
-            <div {...getRootProps({className: "dropzone"})}>
-              <input {...getInputProps()} />
-              {this.props.children}
-            </div>
-          </section>
-        )}
-      </Dropzone>
-    );
+  const accept = props.mimeTypes ? props.mimeTypes.join(", ") : null;
+  let className = "dropzone-container";
+  if (props.light) {
+    className += " light";
   }
+
+  return (
+    <Dropzone
+      onDrop={onDrop}
+      onDropAccepted={onDropAccepted}
+      accept={accept}
+      multiple={false}
+    >
+      {({getRootProps, getInputProps}) => (
+        <section className={className}>
+          <div {...getRootProps({className: "dropzone"})}>
+            <input {...getInputProps()} />
+            {props.children}
+          </div>
+        </section>
+      )}
+    </Dropzone>
+  );
 }
+
+LoadDataset.propTypes = {
+  mimeTypes: PropTypes.arrayOf(PropTypes.string),
+  light: PropTypes.bool
+};
+LoadDataset.defaultProps = {
+  light: false,
+};
 
 export default connect(
   null,

@@ -6,7 +6,7 @@ import { getName } from "../redux/dataset/selectors";
 function DisplayDataset(props) {
   return (
     <span>
-      {props.name}
+      Dataset: {props.name}
     </span>
   );
 }

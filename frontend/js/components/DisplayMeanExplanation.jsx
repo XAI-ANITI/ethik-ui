@@ -1,33 +1,35 @@
+require("../../sass/DisplayMeanExplanation.scss");
+
 import React from "react";
 import { connect } from "react-redux";
 
 import { getFeatures } from "../redux/mean_explainer/selectors";
 import { selectFeature } from "../redux/mean_explainer/reducer";
 
-class DisplayMeanExplanation extends React.Component {
-  handleChange = (e) => {
-    this.props.selectFeature({
+function DisplayMeanExplanation(props) {
+  const handleChange = (e) => {
+    props.selectFeature({
       feature: e.target.value
     });
   }
 
-  render() {
-    if (!this.props.features.size) {
-      return null;
-    }
+  if (!props.features.size) {
+    return null;
+  }
 
-    const options = this.props.features.map(feature => (
-      <option key={feature} value={feature}>{feature}</option>
-    ));
-    return (
+  const options = props.features.map(feature => (
+    <option key={feature} value={feature}>{feature}</option>
+  ));
+  return (
+    <div className="explanation-header">
       <label>
         Select a feature:
-        <select value={this.props.selectedFeature} onChange={this.handleChange}>
+        <select value={props.selectedFeature} onChange={handleChange}>
           {options}
         </select>
       </label>
-    );
-  }
+    </div>
+  );
 }
 
 export default connect(
