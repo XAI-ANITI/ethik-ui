@@ -27,7 +27,8 @@ function PlotMeanExplanation(props) {
             }
           ]}
           layout={{
-            margin: { t: 50, r: 50 },
+            margin: { t: 70, r: 50 },
+            title: feature,
             xaxis: {
               title: `Mean ${feature} of the dataset`,
             },

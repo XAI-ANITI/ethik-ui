@@ -2,41 +2,34 @@ require("../../sass/DisplayMeanExplanation.scss");
 
 import React from "react";
 import { connect } from "react-redux";
+import Select from "react-select";
 
 import { getFeatures, getSelectedFeatures } from "../redux/mean_explainer/selectors";
 import { selectFeatures } from "../redux/mean_explainer/reducer";
 
 function DisplayMeanExplanation(props) {
-  const handleChange = (e) => {
-    const options = e.target.options;
-    let value = [];
-    for (var i = 0, l = options.length; i < l; i++) {
-      if (options[i].selected) {
-        value.push(options[i].value);
-      }
-    }
-    props.selectFeatures({
-      features: value
-    });
-  }
+  const handleChange = (selected) => props.selectFeatures({
+    features: selected.map(option => option.value)
+  });
 
   if (!props.features.size) {
     return null;
   }
 
-  const options = props.features.map(feature => (
-    <option key={feature} value={feature}>{feature}</option>
-  ));
   const selectedFeatures = props.selectedFeatures.toJS();
+  const options = props.features.map(f => ({ value: f, label: f })).toJS();
+  const value = selectedFeatures.map(f => ({ value: f, label: f }));
 
   return (
     <div className="explanation-header">
-      <label>
-        Select a feature:
-        <select multiple value={selectedFeatures} onChange={handleChange}>
-          {options}
-        </select>
-      </label>
+      <Select
+        value={value}
+        onChange={handleChange}
+        options={options}
+        placeholder="Select features to plot"
+        isMulti
+        isSearchable
+      />
     </div>
   );
 }
