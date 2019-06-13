@@ -1,48 +1,59 @@
+require("../../sass/PlotMeanExplanation.scss");
+
 import React from "react";
 import { connect } from "react-redux";
 import Plot from "react-plotly.js";
 
-import { isDatasetExplained, getTaus, getMeans, getAccuracies, getSelectedFeature } from "../redux/mean_explainer/selectors";
+import { isDatasetExplained, getTaus, getMeans, getAccuracies, getSelectedFeatures } from "../redux/mean_explainer/selectors";
 
 function PlotMeanExplanation(props) {
-  if (!props.isDatasetExplained || !props.selectedFeature) {
+  if (!props.selectedFeatures.size) {
     return null;
   }
-  const means = props.means.get(props.selectedFeature).toJS();
-  const accuracies = props.accuracies.get(props.selectedFeature).toJS();
+
+  const plots = props.selectedFeatures.map(feature => {
+    const means = props.means.get(feature).toJS();
+    const accuracies = props.accuracies.get(feature).toJS();
+    
+    return (
+      <div key={feature} className="plot">
+        <Plot
+          data={[
+            {
+              x: means,
+              y: accuracies,
+              type: "scatter",
+              mode: "lines+markers",
+            }
+          ]}
+          layout={{
+            margin: { t: 50, r: 50 },
+            xaxis: {
+              title: `Mean ${feature} of the dataset`,
+            },
+            yaxis: {
+              title: "Accuracy",
+              range: [0, 1],
+              showline: true,
+            }
+          }}
+        />
+      </div>
+    );
+  });
+
   return (
-    <div>
-      <Plot
-        data={[
-          {
-            x: means,
-            y: accuracies,
-            type: "scatter",
-            mode: "lines+markers",
-          }
-        ]}
-        layout={{
-          margin: { t: 50 },
-          xaxis: {
-            title: `Mean ${props.selectedFeature} of the dataset`,
-          },
-          yaxis: {
-            title: "Accuracy",
-            range: [0, 1],
-            showline: true,
-          }
-        }}
-      />
+    <div className="plots">
+      {plots}
     </div>
   );
 }
 
 export default connect(
   state => ({
-    isDatasetExplained: isDatasetExplained(state),
     taus: getTaus(state),
     means: getMeans(state),
     accuracies: getAccuracies(state),
-    selectedFeature: getSelectedFeature(state),
+    selectedFeatures: getSelectedFeatures(state),
   })
 )(PlotMeanExplanation);

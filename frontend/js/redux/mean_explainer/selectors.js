@@ -20,5 +20,5 @@ export const getFeature = (store, feature) =>
   { means: getMeans(store).get(feature), accuracies: getAccuracies(store).get(feature) } :
   null;
 
-export const getSelectedFeature = store =>
-  store && store.meanExplainer ? store.meanExplainer.selectedFeature : "";
+export const getSelectedFeatures = store =>
+  store && store.meanExplainer ? store.meanExplainer.selectedFeatures : new List();
