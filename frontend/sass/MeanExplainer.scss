@@ -1,0 +1,26 @@
+#mean_explainer {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+
+  .explanation_header {
+    min-width: 300px;
+    margin: auto;
+  }
+
+  .plots {
+    flex: 1;
+
+    .plot {
+      display: inline-block;
+    }
+  }
+
+  .spinner {
+    text-align: center;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: center;
+  }
+}

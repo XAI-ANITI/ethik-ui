@@ -4,9 +4,7 @@ import { connect } from "react-redux";
 import { getName as getDatasetName } from "../redux/dataset/selectors";
 import Header from "./Header";
 import LoadDataset from "./LoadDataset";
-import ExplainWithMean from "./ExplainWithMean";
-import DisplayMeanExplanation from "./DisplayMeanExplanation";
-import PlotMeanExplanation from "./PlotMeanExplanation";
+import MeanExplainer from "./MeanExplainer";
 
 function App(props) {
   return (
@@ -17,9 +15,9 @@ function App(props) {
           <p>Drag and drop a CSV file or click to select one.</p>
         </LoadDataset>
       }
-      <ExplainWithMean endpoint="explain_with_mean" />
-      <DisplayMeanExplanation />
-      <PlotMeanExplanation />
+      {props.isDatasetLoaded &&
+        <MeanExplainer />
+      }
     </div>
   );
 }

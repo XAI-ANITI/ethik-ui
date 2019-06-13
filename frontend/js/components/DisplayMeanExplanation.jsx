@@ -1,5 +1,3 @@
-require("../../sass/DisplayMeanExplanation.scss");
-
 import React from "react";
 import { connect } from "react-redux";
 import Select from "react-select";
@@ -21,7 +19,7 @@ function DisplayMeanExplanation(props) {
   const value = selectedFeatures.map(f => ({ value: f, label: f }));
 
   return (
-    <div className="explanation-header">
+    <div className="explanation_header">
       <Select
         value={value}
         onChange={handleChange}
