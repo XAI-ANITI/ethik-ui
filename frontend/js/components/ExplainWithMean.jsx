@@ -1,8 +1,13 @@
+require("../../sass/ExplainWithMean.scss");
+
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
+import FontAwesome from "react-fontawesome";
 
 import { explain } from "../redux/mean_explainer/reducer";
+import { isLoaded as isDatasetLoaded } from "../redux/dataset/selectors";
+import { isDatasetExplained } from "../redux/mean_explainer/selectors";
 import API from "../api";
 
 class ExplainWithMean extends Component {
@@ -15,7 +20,7 @@ class ExplainWithMean extends Component {
     this.state = { loading: false };
   }
 
-  handleClick = () => {
+  explain = () => {
     this.setState(state => ({
       loading: true
     }));
@@ -44,23 +49,32 @@ class ExplainWithMean extends Component {
   }
 
   render() {
+    if (this.props.isExplained || !this.props.isLoaded) {
+      return null;
+    }
+
     if (this.state.loading) {
       return (
-        <div>Loading...</div>
+        <div class="spinner">
+          <FontAwesome
+            name="spinner"
+            size="4x"
+            spin
+          />
+        </div>
       );
     }
-    if (this.props.dataset.file) {
-      return (
-        <button onClick={this.handleClick}>
-        Explain with means
-        </button>
-      );
-    }
+
+    this.explain();
     return null;
   }
 }
 
 export default connect(
-  state => ({ dataset: state.dataset }),
+  state => ({
+    dataset: state.dataset,
+    isLoaded: isDatasetLoaded(state),
+    isExplained: isDatasetExplained(state),
+  }),
   { explain }
 )(ExplainWithMean);

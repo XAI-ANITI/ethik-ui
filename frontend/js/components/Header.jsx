@@ -13,7 +13,7 @@ function Header(props) {
       <div className="dataset-wrapper">
         <DisplayDataset />
       </div>
-      <LoadDataset mimeTypes={["text/csv"]} light={true}>
+      <LoadDataset mimeTypes={["text/csv"]} light>
         <FontAwesome
           name="cloud-upload-alt"
           size="2x"

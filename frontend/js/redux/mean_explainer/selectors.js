@@ -1,3 +1,6 @@
+export const isDatasetExplained = store => 
+  store && store.meanExplainer ? store.meanExplainer.explanation.features.size > 0 : false;
+
 export const getTaus = store => 
   store && store.meanExplainer ? store.meanExplainer.explanation.taus : [];
 
