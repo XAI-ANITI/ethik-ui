@@ -6,15 +6,16 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 
 import { load as loadDataset } from "../redux/dataset/reducer"
+import { readColumns } from "../utils/dataset";
 
 function LoadDataset(props) {
-  const [files, setFiles] = useState([]);
-
-  const onDrop = (files) => setFiles(files);
-
   const onDropAccepted = (files) => {
     const file = files[0];
-    props.loadDataset({ name: file.name, file: file });
+    readColumns(file, (cols) => props.loadDataset({
+      name: file.name,
+      file: file,
+      columns: cols,
+    }));
   }
 
   const accept = props.mimeTypes ? props.mimeTypes.join(", ") : null;
@@ -25,7 +26,6 @@ function LoadDataset(props) {
 
   return (
     <Dropzone
-      onDrop={onDrop}
       onDropAccepted={onDropAccepted}
       accept={accept}
       multiple={false}

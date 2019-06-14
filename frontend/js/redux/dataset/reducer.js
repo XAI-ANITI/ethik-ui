@@ -1,4 +1,5 @@
 import { createAction, handleActions } from "redux-actions";
+import Immutable from "immutable";
 
 import Dataset from "./record";
 import { clear as clearMeanExplainer } from "../mean_explainer/reducer";
@@ -12,15 +13,15 @@ export function load(dataset) {
   }
 }
 
-const INITIAL_STATE = new Dataset();
+const INITIAL_STATE = Dataset;
 
 const DatasetReducer = handleActions(
   {
     [configure]: (state, { payload }) => {
-      return state.set("name", payload.name).set("file", payload.file);
+      return new Dataset(Immutable.fromJS(payload));
     }
   },
-  INITIAL_STATE
+  INITIAL_STATE()
 );
 
 export default DatasetReducer;

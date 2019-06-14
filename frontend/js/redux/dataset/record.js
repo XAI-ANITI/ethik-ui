@@ -1,8 +1,9 @@
-import { Record } from "immutable";
+import { Record, List } from "immutable";
 
 const Dataset = new Record({
   name: "",
-  file: null
+  file: null,
+  columns: new List(),
 });
 
 export default Dataset;

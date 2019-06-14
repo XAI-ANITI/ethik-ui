@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import FontAwesome from "react-fontawesome";
@@ -10,16 +10,14 @@ import API from "../api";
 
 function ExplainWithMean(props) {
   const [isLoading, setIsLoading] = useState(false);
+  const [yPredName, setYPredName] = useState(props.dataset.columns.get(-1));
 
-  useEffect(() => {
-    if (props.isExplained || !props.isLoaded) {
-      return;
-    }
-
+  const explain = () => {
     setIsLoading(true);
 
     const form = new FormData();
     form.append("file", props.dataset.file);
+    form.append("yPredName", yPredName);
 
     API.post(props.endpoint, form)
     .then(function (res) {
@@ -39,20 +37,38 @@ function ExplainWithMean(props) {
       // TODO
       alert("Error: " + e);
     });
-  });
+  };
 
-  if (props.isExplained || !props.isLoaded || !isLoading) {
+  if (props.isExplained || !props.isLoaded) {
     return null;
   }
 
+  if (isLoading) {
+    return (
+      <div className="spinner">
+        <FontAwesome
+          name="spinner"
+          size="4x"
+          spin
+        />
+      </div>
+    );
+  }
+
+  const options = props.dataset.columns.map(c =>
+    <option key={c} value={c}>{c}</option>
+  ).toJS();
+
   return (
-    <div className="spinner">
-      <FontAwesome
-        name="spinner"
-        size="4x"
-        spin
-      />
-    </div>
+    <form onSubmit={explain}>
+      <label>
+        Y pred name:
+        <select value={yPredName} onChange={(e) => setYPredName(e.target.value)}>
+          {options}
+        </select>
+      </label>
+      <input type="submit" value="Explain" />
+    </form>
   );
 }
 
