@@ -25,4 +25,9 @@ def explain_with_mean(request):
         taus=explanation.index.values.tolist(),
         means=explainer.nominal_values(X).to_dict("list"),
         accuracies=explanation.to_dict("list"),
+        names=dict(
+            y=None,
+            y_pred=y.name,
+            X=list(X.columns),
+        )
     ))

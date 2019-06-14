@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 import Select from "react-select";
 
-import { getFeatures, getSelectedFeatures } from "../redux/mean_explainer/selectors";
+import { getFeatureNames, getSelectedFeatures } from "../redux/mean_explainer/selectors";
 import { selectFeatures } from "../redux/mean_explainer/reducer";
 
 function DisplayMeanExplanation(props) {
@@ -34,7 +34,7 @@ function DisplayMeanExplanation(props) {
 
 export default connect(
   state => ({
-    features: getFeatures(state),
+    features: getFeatureNames(state),
     selectedFeatures: getSelectedFeatures(state),
   }),
   { selectFeatures }

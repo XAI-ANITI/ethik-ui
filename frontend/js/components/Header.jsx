@@ -9,7 +9,9 @@ import LoadDataset from "./LoadDataset";
 function Header(props) {
   return (
     <header>
-      <h1>Ethik</h1>
+      <h1>
+        <a href="/">Ethik</a>
+      </h1>
       <div className="dataset-wrapper">
         <DisplayDataset />
       </div>

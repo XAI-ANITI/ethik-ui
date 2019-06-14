@@ -4,7 +4,11 @@ const MeanExplanation = new Record({
   taus: new List(),
   means: new Map(),
   accuracies: new Map(),
-  features: new List(),
+  names: new Map({
+    features: new List(),
+    y: null,
+    yPred: null,
+  }),
 });
 
 export default MeanExplanation;

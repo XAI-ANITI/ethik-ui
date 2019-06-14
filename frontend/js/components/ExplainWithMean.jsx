@@ -27,7 +27,11 @@ function ExplainWithMean(props) {
         taus: res.data.taus,
         means: res.data.means,
         accuracies: res.data.accuracies,
-        features: Object.keys(res.data.accuracies),
+        names: {
+          features: res.data.names.X,
+          y: res.data.names.y,
+          yPred: res.data.names.y_pred,
+        },
       });
       setIsLoading(false);
     })

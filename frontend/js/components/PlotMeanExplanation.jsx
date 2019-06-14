@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import Plot from "react-plotly.js";
 import { schemePaired } from "d3-scale-chromatic";
 
-import { isDatasetExplained, getTaus, getMeans, getAccuracies, getSelectedFeatures } from "../redux/mean_explainer/selectors";
+import { isDatasetExplained, getTaus, getMeans, getAccuracies, getSelectedFeatures, getYPredName } from "../redux/mean_explainer/selectors";
 
 function PlotMeanExplanation(props) {
   if (!props.selectedFeatures.size) {
@@ -40,9 +40,10 @@ function PlotMeanExplanation(props) {
               zeroline: false,
             },
             yaxis: {
-              title: "Accuracy",
+              title: `Proportion of ${props.yPredName} = 1`,
               range: [0, 1],
               showline: true,
+              tickformat: "%",
             }
           }}
         />
@@ -77,9 +78,10 @@ function PlotMeanExplanation(props) {
               zeroline: false,
             },
             yaxis: {
-              title: "Accuracy",
+              title: `Proportion of ${props.yPredName} = 1`,
               range: [0, 1],
               showline: true,
+              tickformat: "%",
             }
           }}
         />
@@ -95,5 +97,6 @@ export default connect(
     means: getMeans(state),
     accuracies: getAccuracies(state),
     selectedFeatures: getSelectedFeatures(state),
+    yPredName: getYPredName(state),
   })
 )(PlotMeanExplanation);
