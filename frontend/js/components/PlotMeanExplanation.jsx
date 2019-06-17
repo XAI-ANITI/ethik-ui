@@ -3,7 +3,8 @@ import { connect } from "react-redux";
 import Plot from "react-plotly.js";
 import { schemePaired } from "d3-scale-chromatic";
 
-import { isDatasetExplained, getTaus, getMeans, getAccuracies, getSelectedFeatures, getYPredName } from "../redux/mean_explainer/selectors";
+import { isDatasetExplained, getTaus, getMeans, getProportions, getAccuracies, getSelectedFeatures, getYPredName, getPlotMode } from "../redux/mean_explainer/selectors";
+import { PLOT_MODES } from "../redux/mean_explainer/shared";
 
 function PlotMeanExplanation(props) {
   if (!props.selectedFeatures.size) {
@@ -11,12 +12,22 @@ function PlotMeanExplanation(props) {
   }
 
   const colorscale = schemePaired;
+  const yData = (
+    props.plotMode == PLOT_MODES.get("PROPORTIONS")
+    ? props.proportions
+    : props.accuracies
+  );
+  const yLabel = (
+    props.plotMode == PLOT_MODES.get("PROPORTIONS")
+    ? `Proportion of ${props.yPredName} = 1`
+    : "Accuracy"
+  );
 
   let i = 0;
   const allInOnePlotData = [];
   const plots = props.selectedFeatures.map(feature => {
     const means = props.means.get(feature).toJS();
-    const accuracies = props.accuracies.get(feature).toJS();
+    const y = yData.get(feature).toJS();
     
     const plot = (
       <div key={feature} className="plot">
@@ -24,7 +35,7 @@ function PlotMeanExplanation(props) {
           data={[
             {
               x: means,
-              y: accuracies,
+              y: y,
               type: "scatter",
               mode: "lines+markers",
               marker: {
@@ -40,7 +51,7 @@ function PlotMeanExplanation(props) {
               zeroline: false,
             },
             yaxis: {
-              title: `Proportion of ${props.yPredName} = 1`,
+              title: yLabel,
               range: [0, 1],
               showline: true,
               tickformat: "%",
@@ -52,7 +63,7 @@ function PlotMeanExplanation(props) {
 
     allInOnePlotData.push({
       x: props.taus.toJS(),
-      y: accuracies,
+      y: y,
       name: feature,
       type: "scatter",
       mode: "lines+markers",
@@ -78,7 +89,7 @@ function PlotMeanExplanation(props) {
               zeroline: false,
             },
             yaxis: {
-              title: `Proportion of ${props.yPredName} = 1`,
+              title: yLabel,
               range: [0, 1],
               showline: true,
               tickformat: "%",
@@ -95,8 +106,10 @@ export default connect(
   state => ({
     taus: getTaus(state),
     means: getMeans(state),
+    proportions: getProportions(state),
     accuracies: getAccuracies(state),
     selectedFeatures: getSelectedFeatures(state),
+    plotMode: getPlotMode(state),
     yPredName: getYPredName(state),
   })
 )(PlotMeanExplanation);

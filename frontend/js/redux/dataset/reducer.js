@@ -1,7 +1,7 @@
 import { createAction, handleActions } from "redux-actions";
 import Immutable from "immutable";
 
-import Dataset from "./record";
+import { Dataset } from "./shared";
 import { clear as clearMeanExplainer } from "../mean_explainer/reducer";
 
 const configure = createAction("DATASET/CONFIGURE");

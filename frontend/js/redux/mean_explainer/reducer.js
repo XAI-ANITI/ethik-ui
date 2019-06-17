@@ -1,15 +1,17 @@
 import { createAction, handleActions } from "redux-actions";
 import Immutable from "immutable";
 
-import MeanExplanation from "./record";
+import { PLOT_MODES, MeanExplanation, getAllowedPlotModes } from "./shared";
 
 export const explain = createAction("MEAN_EXPLAINER/EXPLAIN");
 export const selectFeatures = createAction("MEAN_EXPLAINER/SELECT_FEATURES");
+export const selectPlotMode = createAction("MEAN_EXPLAINER/SELECT_PLOT_MODE");
 export const clear = createAction("MEAN_EXPLAINER/CLEAR");
 
 const INITIAL_STATE = new Immutable.Record({
   explanation: new MeanExplanation(),
   selectedFeatures: new Immutable.List(),
+  plotMode: PLOT_MODES.get("PROPORTIONS"),
 });
 
 const MeanExplainerReducer = handleActions(
@@ -21,6 +23,13 @@ const MeanExplainerReducer = handleActions(
     },
     [selectFeatures]: (state, { payload }) =>
       handleFeatureSelection(state, payload.features),
+    [selectPlotMode]: (state, { payload }) => {
+      const plotMode = payload.plotMode;
+      if (!getAllowedPlotModes(state).includes(plotMode)) {
+        return state;
+      }
+      return state.set("plotMode", plotMode);
+    },
     [clear]: (state, { payload }) => INITIAL_STATE(),
   },
   INITIAL_STATE()

@@ -3,6 +3,7 @@ import { Record, Map, List } from "immutable";
 const MeanExplanation = new Record({
   taus: new List(),
   means: new Map(),
+  proportions: new Map(),
   accuracies: new Map(),
   names: new Map({
     features: new List(),

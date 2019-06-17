@@ -11,6 +11,7 @@ import API from "../api";
 function ExplainWithMean(props) {
   const [isLoading, setIsLoading] = useState(false);
   const [yPredName, setYPredName] = useState(props.dataset.columns.get(-1));
+  const [yName, setYName] = useState("");
 
   const explain = () => {
     setIsLoading(true);
@@ -18,6 +19,7 @@ function ExplainWithMean(props) {
     const form = new FormData();
     form.append("file", props.dataset.file);
     form.append("yPredName", yPredName);
+    form.append("yName", yName);
 
     API.post(props.endpoint, form)
     .then(function (res) {
@@ -25,6 +27,7 @@ function ExplainWithMean(props) {
         taus: res.data.taus,
         means: res.data.means,
         accuracies: res.data.accuracies,
+        proportions: res.data.proportions,
         names: {
           features: res.data.names.X,
           y: res.data.names.y,
@@ -55,7 +58,11 @@ function ExplainWithMean(props) {
     );
   }
 
-  const options = props.dataset.columns.map(c =>
+  const optionsPred = props.dataset.columns.map(c =>
+    <option key={c} value={c}>{c}</option>
+  ).toJS();
+
+  const options = props.dataset.columns.filter(col => col != yPredName).map(c =>
     <option key={c} value={c}>{c}</option>
   ).toJS();
 
@@ -64,6 +71,13 @@ function ExplainWithMean(props) {
       <label>
         Y pred name:
         <select value={yPredName} onChange={(e) => setYPredName(e.target.value)}>
+          {optionsPred}
+        </select>
+      </label>
+      <label>
+        Y name:
+        <select value={yName} onChange={(e) => setYName(e.target.value)}>
+          <option key="" value=""></option>
           {options}
         </select>
       </label>
