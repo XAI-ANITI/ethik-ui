@@ -8,6 +8,7 @@ export const PLOT_MODES = new Map({
 export const MeanExplanation = new Record({
   taus: new List(),
   means: new Map(),
+  originalMeans: new Map(),
   proportions: new Map(),
   accuracies: new Map(),
   names: new Map({

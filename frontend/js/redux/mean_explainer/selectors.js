@@ -11,6 +11,9 @@ export const getTaus = store =>
 export const getMeans = store => 
   store && store.meanExplainer ? store.meanExplainer.explanation.means : new Map();
 
+export const getOriginalMeans = store => 
+  store && store.meanExplainer ? store.meanExplainer.explanation.originalMeans : new Map();
+
 export const getAccuracies = store => 
   store && store.meanExplainer ? store.meanExplainer.explanation.accuracies : new Map();
 

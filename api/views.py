@@ -53,6 +53,7 @@ def explain_with_mean(request):
     return JsonResponse(dict(
         taus=proportions.index.values.tolist(),
         means=explainer.nominal_values(X).to_dict("list"),
+        original_means=X.mean().to_dict(),
         proportions=proportions.to_dict("list"),
         accuracies=accuracies,
         names=dict(

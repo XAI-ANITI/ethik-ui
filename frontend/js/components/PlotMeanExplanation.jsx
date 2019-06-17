@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import Plot from "react-plotly.js";
 import { schemePaired } from "d3-scale-chromatic";
 
-import { isDatasetExplained, getTaus, getMeans, getProportions, getAccuracies, getSelectedFeatures, getYPredName, getPlotMode } from "../redux/mean_explainer/selectors";
+import { isDatasetExplained, getTaus, getMeans, getProportions, getAccuracies, getSelectedFeatures, getYPredName, getPlotMode, getOriginalMeans } from "../redux/mean_explainer/selectors";
 import { PLOT_MODES } from "../redux/mean_explainer/shared";
 
 function PlotMeanExplanation(props) {
@@ -23,6 +23,7 @@ function PlotMeanExplanation(props) {
     : "Accuracy"
   );
 
+
   let i = 0;
   const allInOnePlotData = [];
   const plots = props.selectedFeatures.map(feature => {
@@ -38,8 +39,22 @@ function PlotMeanExplanation(props) {
               y: y,
               type: "scatter",
               mode: "lines+markers",
+              showlegend: false,
+              hoverinfo: "x+y",
               marker: {
                 color: colorscale[i]
+              }
+            },
+            {
+              x: [props.originalMeans.get(feature)],
+              y: [y[means.findIndex(v => v == props.originalMeans.get(feature))]],
+              type: "scatter",
+              mode: "markers",
+              name: "Original mean",
+              hoverinfo: "skip",
+              marker: {
+                symbol: "x",
+                size: 9,
               }
             }
           ]}
@@ -106,6 +121,7 @@ export default connect(
   state => ({
     taus: getTaus(state),
     means: getMeans(state),
+    originalMeans: getOriginalMeans(state),
     proportions: getProportions(state),
     accuracies: getAccuracies(state),
     selectedFeatures: getSelectedFeatures(state),

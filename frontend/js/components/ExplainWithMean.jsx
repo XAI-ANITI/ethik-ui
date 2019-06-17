@@ -27,6 +27,7 @@ function ExplainWithMean(props) {
       props.explain({
         taus: res.data.taus,
         means: res.data.means,
+        originalMeans: res.data.original_means,
         accuracies: res.data.accuracies,
         proportions: res.data.proportions,
         names: {
