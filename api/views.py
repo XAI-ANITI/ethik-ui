@@ -34,7 +34,7 @@ def explain_with_mean(request):
             f"Unknow column '{y_name}' for y name"
         )
 
-    X = data.loc[:, data.columns != y_pred_name]
+    X = data.loc[:, data.columns.difference([y_pred_name, y_name])]
     y_pred = data[y_pred_name]
 
     explainer = ethik.Explainer().fit(X)
@@ -56,8 +56,8 @@ def explain_with_mean(request):
         proportions=proportions.to_dict("list"),
         accuracies=accuracies,
         names=dict(
-            y=None,
-            y_pred=y_pred.name,
+            y=y_name,
+            y_pred=y_pred_name,
             X=list(X.columns),
         )
     ))
