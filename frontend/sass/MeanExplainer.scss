@@ -24,3 +24,27 @@
     justify-content: center;
   }
 }
+
+#explain_with_mean {
+  margin: auto;
+  text-align: right;
+
+  label {
+    font-size: 30px;
+  }
+
+  .Select {
+    display: inline-block;
+    width: 300px;
+    margin-left: 10px;
+    text-align: left;
+  }
+
+  input[type="submit"] {
+    cursor: pointer;
+  }
+
+  >div {
+    margin: 30px 0px;
+  }
+}

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import FontAwesome from "react-fontawesome";
+import Select from "react-select";
 
 import { explain } from "../redux/mean_explainer/reducer";
 import { isLoaded as isDatasetLoaded } from "../redux/dataset/selectors";
@@ -11,7 +12,7 @@ import API from "../api";
 function ExplainWithMean(props) {
   const [isLoading, setIsLoading] = useState(false);
   const [yPredName, setYPredName] = useState(props.dataset.columns.get(-1));
-  const [yName, setYName] = useState("");
+  const [yName, setYName] = useState(null);
 
   const explain = () => {
     setIsLoading(true);
@@ -19,7 +20,7 @@ function ExplainWithMean(props) {
     const form = new FormData();
     form.append("file", props.dataset.file);
     form.append("yPredName", yPredName);
-    form.append("yName", yName);
+    form.append("yName", yName != null ? yName : "");
 
     API.post(props.endpoint, form)
     .then(function (res) {
@@ -58,29 +59,43 @@ function ExplainWithMean(props) {
     );
   }
 
-  const optionsPred = props.dataset.columns.map(c =>
-    <option key={c} value={c}>{c}</option>
-  ).toJS();
+  if (yName == yPredName) {
+    setYName(null);
+  }
 
-  const options = props.dataset.columns.filter(col => col != yPredName).map(c =>
-    <option key={c} value={c}>{c}</option>
-  ).toJS();
+  const optionsPred = props.dataset.columns.toJS().map(
+    c => ({ value: c, label: c })
+  );
+
+  const options = props.dataset.columns.toJS().filter(col => col != yPredName).map(
+    c => ({ value: c, label: c })
+  );
 
   return (
-    <form onSubmit={explain}>
-      <label>
-        Y pred name:
-        <select value={yPredName} onChange={(e) => setYPredName(e.target.value)}>
-          {optionsPred}
-        </select>
-      </label>
-      <label>
-        Y name:
-        <select value={yName} onChange={(e) => setYName(e.target.value)}>
-          <option key="" value=""></option>
-          {options}
-        </select>
-      </label>
+    <form id="explain_with_mean" onSubmit={explain}>
+      <div>
+        <label>Ŷ:</label>
+        <Select
+          value={{ value: yPredName, label: yPredName }}
+          onChange={(sel) => setYPredName(sel.value)}
+          options={optionsPred}
+          className="Select"
+          isSearchable
+        />
+      </div>
+      
+      <div>
+        <label>Y:</label>
+        <Select
+          value={{ value: yName, label: yName }}
+          onChange={(sel) => setYName(sel != null ? sel.value : null)}
+          options={options}
+          className="Select"
+          isSearchable
+          isClearable
+        />
+      </div>
+
       <input type="submit" value="Explain" />
     </form>
   );
