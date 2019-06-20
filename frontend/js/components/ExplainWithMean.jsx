@@ -25,16 +25,9 @@ function ExplainWithMean(props) {
     API.post(props.endpoint, form)
     .then(function (res) {
       props.explain({
-        taus: res.data.taus,
-        means: res.data.means,
-        originalMeans: res.data.original_means,
-        accuracies: res.data.accuracies,
-        proportions: res.data.proportions,
-        names: {
-          features: res.data.features,
-          y: res.data.y_name,
-          yPred: res.data.y_pred_name,
-        },
+        featureNames: res.data.features,
+        yName: res.data.y_name,
+        yPredName: res.data.y_pred_name,
       });
       setIsLoading(false);
     })

@@ -19,7 +19,7 @@ const MeanExplainerReducer = handleActions(
     [explain]: (state, { payload }) => {
       const explanation = new MeanExplanation(Immutable.fromJS(payload));
       state = state.set("explanation", explanation);
-      return handleFeatureSelection(state, [explanation.names.get("features").get(0)]);
+      return handleFeatureSelection(state, [explanation.featureNames.get(0)]);
     },
     [selectFeatures]: (state, { payload }) =>
       handleFeatureSelection(state, payload.features),

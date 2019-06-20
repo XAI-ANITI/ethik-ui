@@ -81,25 +81,23 @@ def plot_predictions(request):
     except KeyError:
         return HttpResponseBadRequest("The dataset must be explained first")
 
-    figures = {}
-    for feature in features:
-        feature_exp = explanation.query(f"feature == '{feature}'")
-        figures[feature] = ethik.Explainer.make_predictions_fig(feature_exp)
+    explanation = explanation.query(f"feature in {features}")
+    feat_figures = ethik.Explainer.make_predictions_fig(explanation, with_taus=False)
+    tau_figure = ethik.Explainer.make_predictions_fig(explanation, with_taus=True)
 
     return JsonResponse(dict(
-        tau_plot=dict( # TODO
-            data=[],
-            layout={},
+        tau_plot=dict(
+            data=json.loads(json.dumps(tau_figure.data, cls=PlotlyJSONEncoder)),
+            layout=json.loads(json.dumps(tau_figure.layout, cls=PlotlyJSONEncoder)),
         ),
         feature_plots={
             feature: dict(
                 data=json.loads(json.dumps(fig.data, cls=PlotlyJSONEncoder)),
                 layout=json.loads(json.dumps(fig.layout, cls=PlotlyJSONEncoder)),
             )
-            for feature, fig in figures.items()
+            for feature, fig in feat_figures.items()
         }
     ))
-        
 
 
 def plot_metric(request):
