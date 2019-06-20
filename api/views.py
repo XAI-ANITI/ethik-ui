@@ -77,7 +77,7 @@ def plot_predictions(request):
         return HttpResponseBadRequest("The features list cannot be empty")
 
     try:
-        explanation = pd.read_json(request.session["predictions_exp"])
+        explanation = pd.read_json(request.session["predictions_exp"]).sort_index()
     except KeyError:
         return HttpResponseBadRequest("The dataset must be explained first")
 
@@ -86,15 +86,9 @@ def plot_predictions(request):
     tau_figure = ethik.Explainer.make_predictions_fig(explanation, with_taus=True)
 
     return JsonResponse(dict(
-        tau_plot=dict(
-            data=json.loads(json.dumps(tau_figure.data, cls=PlotlyJSONEncoder)),
-            layout=json.loads(json.dumps(tau_figure.layout, cls=PlotlyJSONEncoder)),
-        ),
+        tau_plot=json.loads(json.dumps(tau_figure, cls=PlotlyJSONEncoder)),
         feature_plots={
-            feature: dict(
-                data=json.loads(json.dumps(fig.data, cls=PlotlyJSONEncoder)),
-                layout=json.loads(json.dumps(fig.layout, cls=PlotlyJSONEncoder)),
-            )
+            feature: json.loads(json.dumps(fig, cls=PlotlyJSONEncoder))
             for feature, fig in feat_figures.items()
         }
     ))
