@@ -1,5 +1,9 @@
+import json
+
 from django.http import HttpResponseBadRequest, JsonResponse
 import ethik
+import pandas as pd
+from plotly.utils import PlotlyJSONEncoder
 from sklearn import metrics
 
 from .readers import read_ds
@@ -38,27 +42,65 @@ def explain_with_mean(request):
     y_pred = data[y_pred_name]
 
     explainer = ethik.Explainer().fit(X)
-    proportions = explainer.explain_predictions(X, y_pred)
+    predictions_exp = explainer.explain_predictions(X, y_pred)
 
-    accuracies = {}
+    metric_exp = None
     if y_name:
         y = data[y_name]
-        accuracies = explainer.explain_metric(
+        metric_exp = explainer.explain_metric(
             X,
             y,
             y_pred,
             metrics.accuracy_score
-        ).to_dict("list")
+        )
+
+    request.session["dataset_name"] = f.name
+    request.session["predictions_exp"] = predictions_exp.to_json()
+    if metric_exp is not None:
+        request.session["metric_exp"] = metric_exp.to_json()
 
     return JsonResponse(dict(
-        taus=proportions.index.values.tolist(),
-        means=explainer.nominal_values(X).to_dict("list"),
-        original_means=X.mean().to_dict(),
-        proportions=proportions.to_dict("list"),
-        accuracies=accuracies,
-        names=dict(
-            y=y_name,
-            y_pred=y_pred_name,
-            X=list(X.columns),
-        )
+        dataset_name=f.name,
+        features=explainer.features,
+        y_name=y_name,
+        y_pred_name=y_pred_name,
     ))
+
+
+def plot_predictions(request):
+    try:
+        features = json.loads(request.body)["features"]
+    except KeyError as e:
+        return HttpResponseBadRequest(str(e))
+
+    if not features:
+        return HttpResponseBadRequest("The features list cannot be empty")
+
+    try:
+        explanation = pd.read_json(request.session["predictions_exp"])
+    except KeyError:
+        return HttpResponseBadRequest("The dataset must be explained first")
+
+    figures = {}
+    for feature in features:
+        feature_exp = explanation.query(f"feature == '{feature}'")
+        figures[feature] = ethik.Explainer.make_predictions_fig(feature_exp)
+
+    return JsonResponse(dict(
+        tau_plot=dict( # TODO
+            data=[],
+            layout={},
+        ),
+        feature_plots={
+            feature: dict(
+                data=json.loads(json.dumps(fig.data, cls=PlotlyJSONEncoder)),
+                layout=json.loads(json.dumps(fig.layout, cls=PlotlyJSONEncoder)),
+            )
+            for feature, fig in figures.items()
+        }
+    ))
+        
+
+
+def plot_metric(request):
+    pass

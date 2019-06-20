@@ -10,7 +10,7 @@ function MeanExplainer(props) {
     <div id="mean_explainer">
       <ExplainWithMean endpoint="explain_with_mean" />
       <DisplayMeanExplanation />
-      <PlotMeanExplanation />
+      <PlotMeanExplanation endpoint="plot_predictions" />
     </div>
   );
 }

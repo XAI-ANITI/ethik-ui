@@ -31,9 +31,9 @@ function ExplainWithMean(props) {
         accuracies: res.data.accuracies,
         proportions: res.data.proportions,
         names: {
-          features: res.data.names.X,
-          y: res.data.names.y,
-          yPred: res.data.names.y_pred,
+          features: res.data.features,
+          y: res.data.y_name,
+          yPred: res.data.y_pred_name,
         },
       });
       setIsLoading(false);

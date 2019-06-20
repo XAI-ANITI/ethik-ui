@@ -1,131 +1,105 @@
+// https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#fetching-external-data-when-props-change
+
 import React from "react";
 import { connect } from "react-redux";
 import Plot from "react-plotly.js";
-import { schemePaired } from "d3-scale-chromatic";
+import Immutable from "immutable";
 
 import { isDatasetExplained, getTaus, getMeans, getProportions, getAccuracies, getSelectedFeatures, getYPredName, getPlotMode, getOriginalMeans } from "../redux/mean_explainer/selectors";
 import { PLOT_MODES } from "../redux/mean_explainer/shared";
+import API from "../api";
 
-function PlotMeanExplanation(props) {
-  if (!props.selectedFeatures.size) {
+class PlotMeanExplanation extends React.Component {
+  state = {
+    plots: null,
+    prevFeatures: new Immutable.List(),
+  };
+
+  static getDerivedStateFromProps(props, state) {
+    if (!props.features.equals(state.prevFeatures)) {
+      return {
+        plots: null,
+        prevFeatures: props.features,
+      };
+    }
     return null;
   }
 
-  const colorscale = schemePaired;
-  const yData = (
-    props.plotMode == PLOT_MODES.get("PROPORTIONS")
-    ? props.proportions
-    : props.accuracies
-  );
-  const yLabel = (
-    props.plotMode == PLOT_MODES.get("PROPORTIONS")
-    ? `Proportion of ${props.yPredName} = 1`
-    : "Accuracy"
-  );
+  componentDidMount() {
+    this._loadPlots(this.props.features);
+  }
 
+  componentDidUpdate(prevProps, prevState) {
+    if (this.state.plots === null) {
+      this._loadPlots(this.props.features);
+    }
+  }
 
-  let i = 0;
-  const allInOnePlotData = [];
-  const plots = props.selectedFeatures.map(feature => {
-    const means = props.means.get(feature).toJS();
-    const y = yData.get(feature).toJS();
-    
-    const plot = (
-      <div key={feature} className="plot">
-        <Plot
-          data={[
-            {
-              x: means,
-              y: y,
-              type: "scatter",
-              mode: "lines+markers",
-              showlegend: false,
-              hoverinfo: "x+y",
-              marker: {
-                color: colorscale[i]
-              }
-            },
-            {
-              x: [props.originalMeans.get(feature)],
-              y: [y[means.findIndex(v => v == props.originalMeans.get(feature))]],
-              type: "scatter",
-              mode: "markers",
-              name: "Original mean",
-              hoverinfo: "skip",
-              marker: {
-                symbol: "x",
-                size: 9,
-              }
-            }
-          ]}
-          layout={{
-            margin: { t: 70, r: 50 },
-            title: feature,
-            xaxis: {
-              title: `Mean ${feature} of the dataset`,
-              zeroline: false,
-            },
-            yaxis: {
-              title: yLabel,
-              range: [0, 1],
-              showline: true,
-              tickformat: "%",
-            }
-          }}
-        />
+  componentWillUnmount() {
+    if (this._asyncRequest) {
+      this._asyncRequest.cancel();
+    }
+  }
+
+  _loadPlots(features) {
+    if (!features.size) {
+      return;
+    }
+
+    const this_ = this;
+
+    this._asyncRequest = API.post(this.props.endpoint, {
+      features: features.toJS()
+    })
+    .then(function (res) {
+      this_._asyncRequest = null;
+      this_.setState({
+        plots: {
+          tau: res.data.tau_plot,
+          features: res.data.feature_plots
+        }
+      });
+    })
+    .catch(function (e) {
+      // TODO
+      alert("Error: " + e);
+    });
+  }
+
+  render() {
+    if (this.state.plots === null) {
+      // TODO: loader
+      return null;
+    }
+
+    let featurePlots = [];
+    for (let feat in this.state.plots.features) {
+      featurePlots.push(
+        <div key={feat} className="plot">
+          <Plot
+            data={this.state.plots.features[feat].data}
+            layout={this.state.plots.features[feat].layout}
+          />
+        </div>
+      );
+    }
+
+    return (
+      <div className="plots">
+        <div className="plot">
+          <Plot
+            data={this.state.plots.tau.data}
+            layout={this.state.plots.tau.layout}
+          />
+        </div>
+        {featurePlots}
       </div>
     );
-
-    allInOnePlotData.push({
-      x: props.taus.toJS(),
-      y: y,
-      name: feature,
-      type: "scatter",
-      mode: "lines+markers",
-      marker: {
-        color: colorscale[i]
-      }
-    });
-
-    i++;
-    return plot;
-  });
-
-  return (
-    <div className="plots">
-      <div className="plot">
-        <Plot
-          data={allInOnePlotData}
-          layout={{
-            margin: { t: 70, r: 50 },
-            showlegend: true,
-            xaxis: {
-              title: "tau",
-              zeroline: false,
-            },
-            yaxis: {
-              title: yLabel,
-              range: [0, 1],
-              showline: true,
-              tickformat: "%",
-            }
-          }}
-        />
-      </div>
-      {plots}
-    </div>
-  );
+  }
 }
 
 export default connect(
   state => ({
-    taus: getTaus(state),
-    means: getMeans(state),
-    originalMeans: getOriginalMeans(state),
-    proportions: getProportions(state),
-    accuracies: getAccuracies(state),
-    selectedFeatures: getSelectedFeatures(state),
-    plotMode: getPlotMode(state),
-    yPredName: getYPredName(state),
+    features: getSelectedFeatures(state),
   })
 )(PlotMeanExplanation);
