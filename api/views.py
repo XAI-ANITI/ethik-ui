@@ -40,24 +40,18 @@ def explain_with_mean(request):
 
     X = data.loc[:, data.columns.difference([y_pred_name, y_name])]
     y_pred = data[y_pred_name]
-
     explainer = ethik.Explainer().fit(X)
-    predictions_exp = explainer.explain_predictions(X, y_pred)
-
-    metric_exp = None
-    if y_name:
-        y = data[y_name]
-        metric_exp = explainer.explain_metric(
-            X,
-            y,
-            y_pred,
-            metrics.accuracy_score
-        )
 
     request.session["dataset_name"] = f.name
-    request.session["predictions_exp"] = predictions_exp.to_json()
-    if metric_exp is not None:
-        request.session["metric_exp"] = metric_exp.to_json()
+    request.session["predictions_exp"] = explainer.explain_predictions(X, y_pred).to_json()
+    request.session["importances_exp"] = explainer.explain_importances(X, y_pred).to_json()
+    if y_name:
+        request.session["metric_exp"] = explainer.explain_metric(
+            X,
+            data[y_name],
+            y_pred,
+            metrics.accuracy_score
+        ).to_json()
 
     return JsonResponse(dict(
         dataset_name=f.name,
@@ -67,7 +61,7 @@ def explain_with_mean(request):
     ))
 
 
-def plot_predictions(request):
+def _plot_explanation(request, session_key, make_fig):
     try:
         features = json.loads(request.body)["features"]
     except KeyError as e:
@@ -77,13 +71,13 @@ def plot_predictions(request):
         return HttpResponseBadRequest("The features list cannot be empty")
 
     try:
-        explanation = pd.read_json(request.session["predictions_exp"]).sort_index()
+        explanation = pd.read_json(request.session[session_key]).sort_index()
     except KeyError:
         return HttpResponseBadRequest("The dataset must be explained first")
 
     explanation = explanation.query(f"feature in {features}")
-    feat_figures = ethik.Explainer.make_predictions_fig(explanation, with_taus=False)
-    tau_figure = ethik.Explainer.make_predictions_fig(explanation, with_taus=True)
+    feat_figures = make_fig(explanation, with_taus=False)
+    tau_figure = make_fig(explanation, with_taus=True)
 
     return JsonResponse(dict(
         tau_plot=json.loads(json.dumps(tau_figure, cls=PlotlyJSONEncoder)),
@@ -93,6 +87,28 @@ def plot_predictions(request):
         }
     ))
 
+def plot_predictions(request):
+    return _plot_explanation(
+        request,
+        "predictions_exp",
+        ethik.Explainer.make_predictions_fig
+    )
+
 
 def plot_metric(request):
-    pass
+    return _plot_explanation(
+        request,
+        "metric_exp",
+        ethik.Explainer.make_metric_fig
+    )
+
+
+def plot_importances(request):
+    try:
+        importances = pd.read_json(request.session["importances_exp"]).sort_index()
+    except KeyError:
+        return HttpResponseBadRequest("The dataset must be explained first")
+
+    # TODO: colors
+    fig = ethik.Explainer.make_importances_fig(importances)
+    return JsonResponse(json.loads(json.dumps(fig, cls=PlotlyJSONEncoder)))

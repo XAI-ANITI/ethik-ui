@@ -11,7 +11,7 @@ export const clear = createAction("MEAN_EXPLAINER/CLEAR");
 const INITIAL_STATE = new Immutable.Record({
   explanation: new MeanExplanation(),
   selectedFeatures: new Immutable.List(),
-  plotMode: PLOT_MODES.get("PROPORTIONS"),
+  plotMode: PLOT_MODES.get("PREDICTIONS"),
 });
 
 const MeanExplainerReducer = handleActions(
