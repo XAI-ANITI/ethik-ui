@@ -1,12 +1,9 @@
-import json
-
 from django.http import HttpResponseBadRequest, JsonResponse
 import ethik
 import pandas as pd
-from plotly.utils import PlotlyJSONEncoder
 from sklearn import metrics
 
-from .readers import read_ds
+from .utils import plotly_to_json, read_ds
 
 
 def explain_with_mean(request):
@@ -61,54 +58,27 @@ def explain_with_mean(request):
     ))
 
 
-def _plot_explanation(request, session_key, make_fig):
-    try:
-        features = json.loads(request.body)["features"]
-    except KeyError as e:
-        return HttpResponseBadRequest(str(e))
-
-    if not features:
-        return HttpResponseBadRequest("The features list cannot be empty")
-
-    try:
-        explanation = pd.read_json(request.session[session_key]).sort_index()
-    except KeyError:
-        return HttpResponseBadRequest("The dataset must be explained first")
-
-    explanation = explanation.query(f"feature in {features}")
-    feat_figures = make_fig(explanation, with_taus=False)
-    tau_figure = make_fig(explanation, with_taus=True)
-
-    return JsonResponse(dict(
-        tau_plot=json.loads(json.dumps(tau_figure, cls=PlotlyJSONEncoder)),
-        feature_plots={
-            feature: json.loads(json.dumps(fig, cls=PlotlyJSONEncoder))
-            for feature, fig in feat_figures.items()
-        }
-    ))
-
 def plot_predictions(request):
-    return _plot_explanation(
-        request,
-        "predictions_exp",
-        ethik.Explainer.make_predictions_fig
-    )
-
-
-def plot_metric(request):
-    return _plot_explanation(
-        request,
-        "metric_exp",
-        ethik.Explainer.make_metric_fig
-    )
-
-
-def plot_importances(request):
     try:
-        importances = pd.read_json(request.session["importances_exp"]).sort_index()
+        predictions_exp = pd.read_json(request.session["predictions_exp"]).sort_index()
+        importances_exp = pd.read_json(request.session["importances_exp"]).sort_index()
     except KeyError:
         return HttpResponseBadRequest("The dataset must be explained first")
 
     # TODO: colors
-    fig = ethik.Explainer.make_importances_fig(importances)
-    return JsonResponse(json.loads(json.dumps(fig, cls=PlotlyJSONEncoder)))
+    feat_figures = ethik.Explainer.make_predictions_fig(predictions_exp, with_taus=False)
+    tau_figure = ethik.Explainer.make_predictions_fig(predictions_exp, with_taus=True)
+    ranking_figure = ethik.Explainer.make_importances_fig(importances_exp)
+
+    return JsonResponse(dict(
+        ranking=plotly_to_json(ranking_figure.data),
+        tau=plotly_to_json(tau_figure.data),
+        features={
+            feature: plotly_to_json(fig.data)
+            for feature, fig in feat_figures.items()
+        }
+    ))
+
+
+def plot_metric(request):
+    raise NotImplementedError()

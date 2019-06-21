@@ -4,12 +4,12 @@ import { connect } from "react-redux";
 import FontAwesome from "react-fontawesome";
 import Select from "react-select";
 
-import { explain } from "../redux/mean_explainer/reducer";
+import { explain } from "../redux/explainer/reducer";
 import { isLoaded as isDatasetLoaded } from "../redux/dataset/selectors";
-import { isDatasetExplained } from "../redux/mean_explainer/selectors";
+import { isDatasetExplained } from "../redux/explainer/selectors";
 import API from "../api";
 
-function ExplainWithMean(props) {
+function SetupExplanation(props) {
   const [isLoading, setIsLoading] = useState(false);
   const [yPredName, setYPredName] = useState(props.dataset.columns.get(-1));
   const [yName, setYName] = useState(null);
@@ -33,7 +33,7 @@ function ExplainWithMean(props) {
     })
     .catch(function (e) {
       // TODO
-      alert("Error: " + e);
+      alert("Errorrrrr: " + e);
     });
   };
 
@@ -66,7 +66,7 @@ function ExplainWithMean(props) {
   );
 
   return (
-    <form id="explain_with_mean" onSubmit={explain}>
+    <form id="explain" onSubmit={explain}>
       <div>
         <label>Ŷ:</label>
         <Select
@@ -95,7 +95,7 @@ function ExplainWithMean(props) {
   );
 }
 
-ExplainWithMean.propTypes = {
+SetupExplanation.propTypes = {
   endpoint: PropTypes.string.isRequired,
 };
 
@@ -106,4 +106,4 @@ export default connect(
     isExplained: isDatasetExplained(state),
   }),
   { explain }
-)(ExplainWithMean);
+)(SetupExplanation);

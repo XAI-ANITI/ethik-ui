@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import { getName as getDatasetName } from "../redux/dataset/selectors";
 import Header from "./Header";
 import LoadDataset from "./LoadDataset";
-import MeanExplainer from "./MeanExplainer";
+import Explainer from "./Explainer";
 
 function App(props) {
   return (
@@ -16,7 +16,7 @@ function App(props) {
         </LoadDataset>
       }
       {props.isDatasetLoaded &&
-        <MeanExplainer />
+        <Explainer />
       }
     </div>
   );

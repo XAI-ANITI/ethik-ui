@@ -5,7 +5,7 @@ import { connect } from "react-redux";
 import Plot from "react-plotly.js";
 import Immutable from "immutable";
 
-import { getSelectedFeatures } from "../redux/mean_explainer/selectors";
+import { getSelectedFeatures } from "../redux/explainer/selectors";
 import API from "../api";
 
 class PlotMeanExplanation extends React.Component {

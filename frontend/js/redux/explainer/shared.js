@@ -2,13 +2,20 @@ import { Record, Map, List } from "immutable";
 
 export const PLOT_MODES = new Map({
   PREDICTIONS: "predictions",
-  SCORES: "scores",
+  METRIC: "metric",
 });
 
-export const MeanExplanation = new Record({
+const _buildPlotsMap = () => {
+  return PLOT_MODES.mapEntries(
+    ([ k, v ]) => [v, null]
+  );
+};
+
+export const Explanation = new Record({
   featureNames: new List(),
   yName: "",
   yPredName: "",
+  plots: _buildPlotsMap(),
 });
 
 export const getAllowedPlotModes = (state) => {
