@@ -66,7 +66,7 @@ function SetupExplanation(props) {
   );
 
   return (
-    <form id="explain" onSubmit={explain}>
+    <form className="explain" onSubmit={explain}>
       <div>
         <label>Ŷ:</label>
         <Select

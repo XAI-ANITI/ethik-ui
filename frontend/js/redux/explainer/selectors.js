@@ -26,9 +26,19 @@ export const getAllowedPlotModes = store => {
   return getAllowedPlotModes_(store.explainer);
 };
 
-export const getRankingPlot = store => {
+const _getPlot = (store, key) => {
   const mode = getPlotMode(store);
   const plots = store.explainer.explanation.plots.get(mode);
   if (!store || !store.explainer || !plots) return null;
-  return plots.get("ranking");
+  return plots.get(key);
+};
+
+export const getRankingPlot = store => _getPlot(store, "ranking");
+
+export const getAllFeaturesPlot = store => _getPlot(store, "all_features");
+
+export const getFeaturePlot = (store, feat) => {
+  const plots = _getPlot(store, "features");
+  if (!plots) return null;
+  return plots.get(feat);
 };

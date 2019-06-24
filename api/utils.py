@@ -13,5 +13,11 @@ def read_ds(f):
     raise ValueError(f"Unsupported content type '{ct}'")
 
 
-def plotly_to_json(obj):
-    return json.loads(json.dumps(obj, cls=PlotlyJSONEncoder))
+def fig_to_json(fig):
+    convert = lambda obj: json.loads(json.dumps(obj, cls=PlotlyJSONEncoder))
+    layout = convert(fig.layout)
+    layout.pop("template")
+    return dict(
+        data=convert(fig.data),
+        layout=layout,
+    )

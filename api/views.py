@@ -3,7 +3,7 @@ import ethik
 import pandas as pd
 from sklearn import metrics
 
-from .utils import plotly_to_json, read_ds
+from .utils import fig_to_json, read_ds
 
 
 def explain_with_mean(request):
@@ -71,10 +71,10 @@ def plot_predictions(request):
     ranking_figure = ethik.Explainer.make_importances_fig(importances_exp)
 
     return JsonResponse(dict(
-        ranking=plotly_to_json(ranking_figure.data),
-        tau=plotly_to_json(tau_figure.data),
+        ranking=fig_to_json(ranking_figure),
+        all_features=fig_to_json(tau_figure),
         features={
-            feature: plotly_to_json(fig.data)
+            feature: fig_to_json(fig)
             for feature, fig in feat_figures.items()
         }
     ))

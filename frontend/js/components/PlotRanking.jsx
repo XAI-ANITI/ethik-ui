@@ -3,8 +3,7 @@ import { connect } from "react-redux";
 import Plot from "react-plotly.js";
 import Immutable from "immutable";
 
-import API from "../api";
-import { getFeatureNames, getRankingPlot } from "../redux/explainer/selectors";
+import { getRankingPlot } from "../redux/explainer/selectors";
 import { selectFeature } from "../redux/explainer/reducer";
 
 function PlotRanking(props) {
@@ -14,38 +13,22 @@ function PlotRanking(props) {
     props.selectFeature({ feature });
   }
 
-  if (props.traces === null) {
+  if (!props.plot) {
     return null;
   }
 
   return (
-    <div className="plot">
-      <Plot
-        data={props.traces.toJS()}
-        layout={{
-          margin: { t: 70 },
-          width: 400,
-          height: 600, // TODO
-          xaxis: {
-            showline: true,
-            zeroline: false,
-            range: [0, 1],
-            side: "top",
-          },
-          yaxis: {
-            showline: true,
-            zeroline: false,
-          },
-        }}
-        onClick={handleClick}
-      />
-    </div>
+    <Plot
+      data={props.plot.get("data").toJS()}
+      layout={props.plot.get("layout").toJS()}
+      onClick={handleClick}
+    />
   );
 }
 
 export default connect(
   state => ({
-    traces: getRankingPlot(state),
+    plot: getRankingPlot(state),
   }),
   { selectFeature }
 )(PlotRanking);

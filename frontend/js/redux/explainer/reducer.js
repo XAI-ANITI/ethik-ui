@@ -55,7 +55,7 @@ const ExplainerReducer = handleActions(
       return state.set("explanation", explanation);
     },
     [selectFeature]: (state, { payload }) => {
-      if (!state.explanation.featureNames.has(payload.feature)) {
+      if (!state.explanation.featureNames.includes(payload.feature)) {
         return state;
       }
       return state.set("selectedFeature", payload.feature);
