@@ -1,6 +1,7 @@
 import io
 import json
 
+import colorlover as cl
 import pandas as pd
 from plotly.utils import PlotlyJSONEncoder
 
@@ -21,3 +22,7 @@ def fig_to_json(fig):
         data=convert(fig.data),
         layout=layout,
     )
+
+
+def interp_color(n, scale=cl.scales["9"]["seq"]["Reds"]):
+    return cl.interp(scale, n)

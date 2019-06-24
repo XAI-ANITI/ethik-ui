@@ -9,6 +9,7 @@ verify_ssl = true
 django = "*"
 pandas = "*"
 scikit-learn = "*"
+colorlover = "*"
 
 [requires]
 python_version = "3.6"

@@ -3,7 +3,7 @@ import ethik
 import pandas as pd
 from sklearn import metrics
 
-from .utils import fig_to_json, read_ds
+from .utils import fig_to_json, interp_color, read_ds
 
 
 def explain_with_mean(request):
@@ -59,17 +59,31 @@ def explain_with_mean(request):
     ))
 
 
-def plot_predictions(request):
+def _plot(request, explanation_key, ranking_key, make_explanation_fig, make_ranking_fig):
     try:
-        predictions_exp = pd.read_json(request.session["predictions_exp"]).sort_index()
-        importances_exp = pd.read_json(request.session["importances_exp"]).sort_index()
+        explanation = pd.read_json(request.session[explanation_key]).sort_index()
+        ranking = pd.read_json(request.session[ranking_key]).sort_index()
     except KeyError:
         return HttpResponseBadRequest("The dataset must be explained first")
 
-    # TODO: colors
-    feat_figures = ethik.Explainer.make_predictions_fig(predictions_exp, with_taus=False)
-    tau_figure = ethik.Explainer.make_predictions_fig(predictions_exp, with_taus=True)
-    ranking_figure = ethik.Explainer.make_importances_fig(importances_exp)
+    sorted_features = ranking.sort_values(by=["importance"])["feature"].unique()
+    colors = interp_color(len(sorted_features))
+    feat_to_color = {
+        feat: color
+        for feat, color in zip(sorted_features, colors)
+    }
+    
+    feat_figures = make_explanation_fig(
+        explanation,
+        with_taus=False,
+        colors=feat_to_color,
+    )
+    tau_figure = make_explanation_fig(
+        explanation,
+        with_taus=True,
+        colors=feat_to_color,
+    )
+    ranking_figure = make_ranking_fig(ranking, colors=colors)
 
     return JsonResponse(dict(
         ranking=fig_to_json(ranking_figure),
@@ -79,27 +93,23 @@ def plot_predictions(request):
             for feature, fig in feat_figures.items()
         }
     ))
+
+
+def plot_predictions(request):
+    return _plot(
+        request,
+        "predictions_exp",
+        "importances_exp",
+        ethik.Explainer.make_predictions_fig,
+        ethik.Explainer.make_importances_fig
+    )
 
 
 def plot_metric(request):
-    try:
-        metric_exp = pd.read_json(request.session["metric_exp"]).sort_index()
-        # TODO: rank according to different criterion
-        importances_exp = pd.read_json(request.session["importances_exp"]).sort_index()
-    except KeyError:
-        return HttpResponseBadRequest("The dataset must be explained first")
-
-    # TODO: colors
-    feat_figures = ethik.Explainer.make_metric_fig(metric_exp, with_taus=False)
-    tau_figure = ethik.Explainer.make_metric_fig(metric_exp, with_taus=True)
-    # TODO: different ranking criterion
-    ranking_figure = ethik.Explainer.make_importances_fig(importances_exp)
-
-    return JsonResponse(dict(
-        ranking=fig_to_json(ranking_figure),
-        all_features=fig_to_json(tau_figure),
-        features={
-            feature: fig_to_json(fig)
-            for feature, fig in feat_figures.items()
-        }
-    ))
+    return _plot(
+        request,
+        "metric_exp",
+        "importances_exp", # TODO
+        ethik.Explainer.make_metric_fig,
+        ethik.Explainer.make_importances_fig # TODO
+    )
