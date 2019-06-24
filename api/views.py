@@ -43,12 +43,13 @@ def explain_with_mean(request):
     request.session["predictions_exp"] = explainer.explain_predictions(X, y_pred).to_json()
     request.session["importances_exp"] = explainer.explain_importances(X, y_pred).to_json()
     if y_name:
-        request.session["metric_exp"] = explainer.explain_metric(
+        metric_exp = explainer.explain_metric(
             X,
             data[y_name],
             y_pred,
             metrics.accuracy_score
-        ).to_json()
+        )
+        request.session["metric_exp"] = metric_exp.to_json()
 
     return JsonResponse(dict(
         dataset_name=f.name,
@@ -81,4 +82,24 @@ def plot_predictions(request):
 
 
 def plot_metric(request):
-    raise NotImplementedError()
+    try:
+        metric_exp = pd.read_json(request.session["metric_exp"]).sort_index()
+        # TODO: rank according to different criterion
+        importances_exp = pd.read_json(request.session["importances_exp"]).sort_index()
+    except KeyError:
+        return HttpResponseBadRequest("The dataset must be explained first")
+
+    # TODO: colors
+    feat_figures = ethik.Explainer.make_metric_fig(metric_exp, with_taus=False)
+    tau_figure = ethik.Explainer.make_metric_fig(metric_exp, with_taus=True)
+    # TODO: different ranking criterion
+    ranking_figure = ethik.Explainer.make_importances_fig(importances_exp)
+
+    return JsonResponse(dict(
+        ranking=fig_to_json(ranking_figure),
+        all_features=fig_to_json(tau_figure),
+        features={
+            feature: fig_to_json(fig)
+            for feature, fig in feat_figures.items()
+        }
+    ))

@@ -21,7 +21,7 @@ export const Explanation = new Record({
 export const getAllowedPlotModes = (state) => {
   let allowed = PLOT_MODES;
   if (!state.explanation.yName) {
-    allowed = allowed.delete("SCORES");
+    allowed = allowed.delete("METRIC");
   }
   return allowed.toList();
 };

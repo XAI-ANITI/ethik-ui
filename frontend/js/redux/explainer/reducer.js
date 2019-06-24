@@ -15,11 +15,11 @@ export const explain = (explanation) => {
       dispatch(_loadExplanation({ explanation }));
       resolve();
     }).then(
-      () => dispatch(selectPlotMode(PLOT_MODES.get("PREDICTIONS")))
+      () => dispatch(selectPlotMode({ mode: PLOT_MODES.get("PREDICTIONS") }))
     );
   };
 };
-export const selectPlotMode = (mode) => {
+export const selectPlotMode = ({ mode }) => {
   return function(dispatch, getState) {
       if (!getAllowedPlotModes(getState().explainer).includes(mode)) {
         return;
