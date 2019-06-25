@@ -4,7 +4,7 @@ import React from "react";
 import FontAwesome from "react-fontawesome";
 
 import DisplayDataset from "./DisplayDataset";
-import LoadDataset from "./LoadDataset";
+import LoadDataset from "./dataset/Load";
 
 function Header(props) {
   return (

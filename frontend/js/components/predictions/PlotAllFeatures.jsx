@@ -2,9 +2,9 @@ import React from "react";
 import { connect } from "react-redux";
 import Plot from "react-plotly.js";
 
-import { getFeaturePlot, getSelectedFeature } from "../redux/explainer/selectors";
+import { getAllFeaturesPlot, getSelectedLabel } from "../../redux/predictions/selectors";
 
-function PlotFeature(props) {
+function PlotAllFeatures(props) {
   if (!props.plot) {
     return null;
   }
@@ -18,6 +18,6 @@ function PlotFeature(props) {
 
 export default connect(
   state => ({
-    plot: getFeaturePlot(state, getSelectedFeature(state)),
+    plot: getAllFeaturesPlot(state),
   })
-)(PlotFeature);
+)(PlotAllFeatures);

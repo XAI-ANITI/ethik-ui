@@ -1,10 +1,9 @@
 import React from "react";
 import { connect } from "react-redux";
 import Plot from "react-plotly.js";
-import Immutable from "immutable";
 
-import { getRankingPlot } from "../redux/explainer/selectors";
-import { selectFeature } from "../redux/explainer/reducer";
+import { getRankingPlot, getSelectedLabel } from "../../redux/predictions/selectors";
+import { selectFeature } from "../../redux/predictions/reducer";
 
 function PlotRanking(props) {
   const handleClick = (data) => {
@@ -13,7 +12,7 @@ function PlotRanking(props) {
     props.selectFeature({ feature });
   }
 
-  if (!props.plot) {
+  if (props.plot === null) {
     return null;
   }
 

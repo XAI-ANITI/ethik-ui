@@ -1,9 +1,11 @@
 import { combineReducers } from "redux";
 
+import AppReducer from "./app/reducer";
 import DatasetReducer from "./dataset/reducer";
-import ExplainerReducer from "./explainer/reducer";
+import PredictionsReducer from "./predictions/reducer";
 
 export default combineReducers({
+  app: AppReducer,
   dataset: DatasetReducer,
-  explainer: ExplainerReducer,
+  predictions: PredictionsReducer,
 });

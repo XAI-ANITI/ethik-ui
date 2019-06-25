@@ -1,14 +1,12 @@
-require("../../sass/LoadDataset.scss");
-
 import React, { useState } from "react";
 import Dropzone from "react-dropzone";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 
-import { load as loadDataset } from "../redux/dataset/reducer"
-import { readColumns } from "../utils/dataset";
+import { load as loadDataset } from "../../redux/dataset/reducer"
+import { readColumns } from "../../utils/dataset";
 
-function LoadDataset(props) {
+function Load(props) {
   const onDropAccepted = (files) => {
     const file = files[0];
     readColumns(file, (cols) => props.loadDataset({
@@ -42,15 +40,15 @@ function LoadDataset(props) {
   );
 }
 
-LoadDataset.propTypes = {
+Load.propTypes = {
   mimeTypes: PropTypes.arrayOf(PropTypes.string),
   light: PropTypes.bool
 };
-LoadDataset.defaultProps = {
+Load.defaultProps = {
   light: false,
 };
 
 export default connect(
   null,
   { loadDataset }
-)(LoadDataset);
+)(Load);
