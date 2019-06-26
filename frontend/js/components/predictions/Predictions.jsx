@@ -4,7 +4,6 @@ import React from "react";
 import { connect } from "react-redux";
 
 import { isCurrentView } from "../../redux/app/selectors";
-import { isExplained } from "../../redux/predictions/selectors";
 
 import Configure from "./Configure";
 import PlotRanking from "./PlotRanking";
@@ -19,16 +18,16 @@ function Predictions(props) {
   return (
     <div id="explainer">
       <div className="config">
-        //<Configure />
+        <Configure />
       </div>
       <div className="plots">
         <div className="ranking">
           <PlotRanking />
         </div>
         <div className="features">
-          //<PlotAllFeatures />
+          <PlotAllFeatures />
           <br />
-          //<PlotFeature />
+          <PlotFeature />
         </div>
       </div>
     </div>
@@ -38,6 +37,5 @@ function Predictions(props) {
 export default connect(
   state => ({
     isViewed: isCurrentView(state, "PREDICTIONS"), 
-    isExplained: isExplained(state),
   }),
 )(Predictions);

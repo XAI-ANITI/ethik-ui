@@ -33,9 +33,10 @@ const DatasetReducer = handleActions(
       );
     },
     [configure]: (state, { payload }) => {
-      const featuresCols = state.columns.subtract([
-        ...state.predLabelsCols,
-        state.trueLabelCol,
+      const featuresCols = state.columns.subtract(
+        payload.predLabelsCols
+      ).subtract([
+        payload.trueLabelCol
       ]);
       return state.set(
         "trueLabelCol", payload.trueLabelCol
