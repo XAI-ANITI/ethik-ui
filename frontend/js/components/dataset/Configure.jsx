@@ -8,7 +8,8 @@ import { OrderedSet } from "immutable";
 import API from "../../api";
 import { configure } from "../../redux/dataset/reducer";
 import { getColumns } from "../../redux/dataset/selectors";
-import { view as viewPredictions } from "../../redux/predictions/reducer";
+import { VIEWS } from "../../redux/app/shared";
+import { changeView } from "../../redux/app/reducer";
 
 function Configure(props) {
   const [isChecking, setIsChecking] = useState(false);
@@ -40,7 +41,9 @@ function Configure(props) {
           predLabelsCols: predLabelsCols,
         });
         resolve();
-      }).then(props.viewPredictions);
+      }).then(
+        () => props.changeView({ view: VIEWS.get("PREDICTIONS") })
+      );
     })
     .catch(function (e) {
       // TODO
@@ -119,5 +122,5 @@ export default connect(
   state => ({
     columns: getColumns(state),
   }),
-  { configure, viewPredictions }
+  { configure, changeView }
 )(Configure);

@@ -2,8 +2,6 @@ import { createAction, handleActions } from "redux-actions";
 import Immutable from "immutable";
 
 import API from "../../api";
-import { changeView } from "../app/reducer";
-import { VIEWS } from "../app/shared";
 import { getFeaturesCols, getPredLabelsCols, getFile } from "../dataset/selectors"; 
 
 const _loadPlots = createAction("PREDICTIONS/LOAD_PLOTS");
@@ -24,7 +22,7 @@ export const view = (payload) => {
     dispatch(selectLabel({ label }));
 
     if (state.predictions.plots !== null) {
-      return dispatch(changeView({ view: VIEWS.get("PREDICTIONS") }));
+      return;
     }
 
     const form = new FormData();
@@ -40,12 +38,7 @@ export const view = (payload) => {
 
     API.post("plot_predictions", form)
     .then(
-      (res) => new Promise((resolve, reject) => {
-        dispatch(_loadPlots({ plots: res.data }));
-        resolve();
-      }).then(
-        () => dispatch(changeView({ view: VIEWS.get("PREDICTIONS") }))
-      )
+      (res) => dispatch(_loadPlots({ plots: res.data }))
     )
     .catch(function (e) {
       // TODO

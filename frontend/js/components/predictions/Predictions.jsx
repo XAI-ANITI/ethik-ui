@@ -16,7 +16,7 @@ function Predictions(props) {
   }
 
   return (
-    <div id="explainer">
+    <div id="predictions">
       <div className="config">
         <Configure />
       </div>
