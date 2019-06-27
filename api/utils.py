@@ -24,5 +24,5 @@ def fig_to_json(fig):
     )
 
 
-def interp_color(n, scale=cl.scales["9"]["seq"]["Reds"]):
-    return cl.interp(scale, n)
+def interp_color(n, scale=cl.scales["9"]["seq"]["YlOrRd"]):
+    return cl.interp(scale, n+1)[1:]

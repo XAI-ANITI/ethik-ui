@@ -79,35 +79,47 @@ function Configure(props) {
 
   return (
     <form className="configure" onSubmit={configure}>
-      <div>
-        <label>Ŷ:</label>
-        <Select
-          value={predLabelsCols.toArray().map(
-            name => ({ value: name, label: name })
-          )}
-          onChange={
-            (sel) => setPredLabelsCols(new OrderedSet(sel.map(opt => opt.value)))
-          }
-          options={optionsPred}
-          className="Select"
-          isSearchable
-          isMulti
-        />
-      </div>
-      
-      <div>
-        <label>Y:</label>
-        <Select
-          value={{ value: trueLabelCol, label: trueLabelCol }}
-          onChange={
-            (sel) => setTrueLabelCol(sel != null ? sel.value : null)
-          }
-          options={options}
-          className="Select"
-          isSearchable
-          isClearable
-        />
-      </div>
+      <table>
+        <tbody>
+          <tr>
+            <td>
+              <label>Ŷ:</label>
+            </td>
+            <td className="select_col">
+              <Select
+                value={predLabelsCols.toArray().map(
+                  name => ({ value: name, label: name })
+                )}
+                onChange={
+                  (sel) => setPredLabelsCols(new OrderedSet(sel.map(opt => opt.value)))
+                }
+                options={optionsPred}
+                className="Select"
+                isSearchable
+                isMulti
+              />
+            </td>
+          </tr>
+          
+          <tr>
+            <td>
+              <label>Y:</label>
+            </td>
+            <td className="select_col">
+              <Select
+                value={{ value: trueLabelCol, label: trueLabelCol }}
+                onChange={
+                  (sel) => setTrueLabelCol(sel != null ? sel.value : null)
+                }
+                options={options}
+                className="Select"
+                isSearchable
+                isClearable
+              />
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
       <input type="submit" value="Explain" />
     </form>

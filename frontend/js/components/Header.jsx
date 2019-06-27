@@ -18,9 +18,7 @@ function Header(props) {
         <a href="/">Ethik</a>
       </h1>
       <div className="dataset">
-        {props.datasetName &&
-          <span>Dataset: {props.datasetName}</span>
-        }
+        {props.datasetName && props.datasetName}
       </div>
       <div className="views_list">
         <ViewsList views={viewsList} />
@@ -28,7 +26,6 @@ function Header(props) {
       <LoadDataset mimeTypes={["text/csv"]} light>
         <FontAwesome
           name="cloud-upload-alt"
-          size="2x"
         />
       </LoadDataset>
     </header>

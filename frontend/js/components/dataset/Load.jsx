@@ -3,6 +3,8 @@ import Dropzone from "react-dropzone";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 
+import { changeView } from "../../redux/app/reducer"
+import { VIEWS } from "../../redux/app/shared"
 import { load as loadDataset } from "../../redux/dataset/reducer"
 import { readColumns } from "../../utils/dataset";
 
@@ -14,6 +16,7 @@ function Load(props) {
       file: file,
       columns: cols,
     }));
+    props.changeView({ view: VIEWS.get("DATASET") });
   }
 
   const accept = props.mimeTypes ? props.mimeTypes.join(", ") : null;
@@ -50,5 +53,5 @@ Load.defaultProps = {
 
 export default connect(
   null,
-  { loadDataset }
+  { loadDataset, changeView }
 )(Load);

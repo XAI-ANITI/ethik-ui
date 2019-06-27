@@ -2,8 +2,10 @@ require("../../../sass/Predictions.scss");
 
 import React from "react";
 import { connect } from "react-redux";
+import FontAwesome from "react-fontawesome";
 
 import { isCurrentView } from "../../redux/app/selectors";
+import { isExplained } from "../../redux/predictions/selectors";
 
 import Configure from "./Configure";
 import PlotRanking from "./PlotRanking";
@@ -13,6 +15,20 @@ import PlotFeature from "./PlotFeature";
 function Predictions(props) {
   if (!props.isViewed) {
     return null;
+  }
+
+  if (!props.isExplained) {
+    return (
+      <div id="predictions">
+        <div className="spinner">
+          <FontAwesome
+            name="spinner"
+            size="4x"
+            spin
+          />
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -37,5 +53,6 @@ function Predictions(props) {
 export default connect(
   state => ({
     isViewed: isCurrentView(state, "PREDICTIONS"), 
+    isExplained: isExplained(state),
   }),
 )(Predictions);

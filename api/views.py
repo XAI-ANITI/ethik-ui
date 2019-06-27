@@ -72,17 +72,6 @@ def explain_predictions(f, features_cols, pred_labels_cols):
         explainer.explain_importances(X, y_pred)
     )
 
-    """
-    if y_name:
-        metric_exp = explainer.explain_metric(
-            X,
-            data[y_name],
-            y_pred if len(y_pred_names) == 1 else y_pred.idxmax(axis="columns"),
-            metrics.accuracy_score
-        )
-        request.session["metric_exp"] = metric_exp.to_json()
-    """
-
 
 def plot_predictions(request):
     try:
@@ -142,5 +131,43 @@ def plot_predictions(request):
     return JsonResponse(resp)
 
 
+def explain_metric(f, features_cols, pred_labels_cols, true_label_col):
+    # TODO: check args (see check_dataset())
+    data = read_ds(f)
+    X = data.loc[:, features_cols]
+    y_pred = data[pred_labels_cols]
+    y_true = data[true_label_col]
+    explainer = ethik.Explainer().fit(X)
+
+    return (
+        explainer.explain_metric(
+            X,
+            y_true,
+            y_pred if len(pred_labels_cols) == 1 else y_pred.idxmax(axis="columns"),
+            metrics.accuracy_score # TODO
+        ),
+        explainer.explain_importances(X, y_pred) # TODO
+    )
+
+
 def plot_metric(request):
-    raise NotImplementedError()
+    try:
+        f = request.FILES["file"]
+        features_cols = request.FILES["features_cols"]
+        pred_labels_cols = request.FILES["pred_labels_cols"]
+        true_label_col = request.POST["true_label_col"]
+    except KeyError as e:
+        return HttpResponseBadRequest(f"Cannot find key '{e}'")
+
+    try:
+        features_cols = json.loads(features_cols.read().decode())
+        pred_labels_cols = json.loads(pred_labels_cols.read().decode())
+    except json.decoder.JSONDecodeError as e:
+        return HttpResponseBadRequest(e)
+
+    try:
+        metric, ranking = explain_metric(f, features_cols, pred_labels_cols, true_label_col)
+    except ValueError as e:
+        return HttpResponseBadRequest(e)
+
+    return JsonResponse({}) # TODO
