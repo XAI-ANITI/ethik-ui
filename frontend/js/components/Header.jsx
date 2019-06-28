@@ -1,6 +1,7 @@
 require("../../sass/Header.scss");
 
 import React from "react";
+import { Link } from "react-router-dom";
 import FontAwesome from "react-fontawesome";
 import { connect } from "react-redux"
 
