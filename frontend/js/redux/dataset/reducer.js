@@ -23,15 +23,11 @@ const INITIAL_STATE = new Immutable.Record({
 
 const DatasetReducer = handleActions(
   {
-    [_load]: (state, { payload }) => {
-      return state.set(
-        "name", payload.name
-      ).set(
-        "file", payload.file
-      ).set(
-        "columns", new Immutable.OrderedSet(payload.columns)
-      );
-    },
+    [_load]: (state, { payload }) => INITIAL_STATE({
+      name: payload.name,
+      file: payload.file,
+      columns: new Immutable.OrderedSet(payload.columns),
+    }),
     [configure]: (state, { payload }) => {
       const featuresCols = state.columns.subtract(
         payload.predLabelsCols

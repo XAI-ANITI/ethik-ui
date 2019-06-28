@@ -11,7 +11,7 @@ export const getAllowedViews = state => {
   if (!state || !state.dataset) return new List();
   let allowed = VIEWS;
   if (!state.dataset.trueLabelCol) {
-    allowed = allowed.delete("METRIC");
+    allowed = allowed.delete("PERFORMANCE");
   }
   return allowed.toSet();
 };
