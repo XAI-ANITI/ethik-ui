@@ -42,7 +42,7 @@ function Configure(props) {
         });
         resolve();
       }).then(
-        () => props.changeView({ view: VIEWS.get("PREDICTIONS") })
+        () => props.changeView({ view: VIEWS.get("BIAS") })
       );
     })
     .catch(function (e) {

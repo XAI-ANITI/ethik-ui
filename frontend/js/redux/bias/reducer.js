@@ -4,10 +4,10 @@ import Immutable from "immutable";
 import API from "../../api";
 import { getFeaturesCols, getPredLabelsCols, getFile } from "../dataset/selectors"; 
 
-const _loadPlots = createAction("PREDICTIONS/LOAD_PLOTS");
-export const selectFeature = createAction("PREDICTIONS/SELECT_FEATURE");
-export const selectLabel = createAction("PREDICTIONS/SELECT_LABEL");
-export const clear = createAction("PREDICTIONS/CLEAR");
+const _loadPlots = createAction("BIAS/LOAD_PLOTS");
+export const selectFeature = createAction("BIAS/SELECT_FEATURE");
+export const selectLabel = createAction("BIAS/SELECT_LABEL");
+export const clear = createAction("BIAS/CLEAR");
 export const view = (payload) => {
   return function(dispatch, getState) {
     const state = getState();
@@ -21,7 +21,7 @@ export const view = (payload) => {
     dispatch(selectFeature({ feature }));
     dispatch(selectLabel({ label }));
 
-    if (state.predictions.plots !== null) {
+    if (state.bias.plots !== null) {
       return;
     }
 
@@ -36,7 +36,7 @@ export const view = (payload) => {
       { type: "application/json" }
     ));
 
-    API.post("plot_predictions", form)
+    API.post("plot_bias", form)
     .then(
       (res) => dispatch(_loadPlots({ plots: res.data }))
     )
@@ -53,7 +53,7 @@ const INITIAL_STATE = new Immutable.Record({
   plots: null,
 });
 
-const PredictionsReducer = handleActions(
+const BiasReducer = handleActions(
   {
     [selectFeature]: (state, { payload }) => {
       return state.set("selectedFeature", payload.feature);
@@ -69,4 +69,4 @@ const PredictionsReducer = handleActions(
   INITIAL_STATE()
 );
 
-export default PredictionsReducer;
+export default BiasReducer;

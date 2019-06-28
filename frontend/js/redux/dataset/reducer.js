@@ -1,13 +1,13 @@
 import { createAction, handleActions } from "redux-actions";
 import Immutable from "immutable";
 
-import { clear as clearPredictions } from "../predictions/reducer";
+import { clear as clearBias } from "../bias/reducer";
 
 const _load = createAction("DATASET/LOAD");
 export function load(dataset) {
   return function(dispatch) {
     dispatch(_load(dataset));
-    dispatch(clearPredictions());
+    dispatch(clearBias());
   }
 }
 export const configure = createAction("DATASET/CONFIGURE");

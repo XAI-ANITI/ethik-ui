@@ -1,17 +1,17 @@
 import { Map, List } from "immutable";
 
 export const getSelectedFeature = state =>
-  state && state.predictions ? state.predictions.selectedFeature : null;
+  state && state.bias ? state.bias.selectedFeature : null;
 
 export const getSelectedLabel = state =>
-  state && state.predictions ? state.predictions.selectedLabel : null;
+  state && state.bias ? state.bias.selectedLabel : null;
 
 export const isExplained = state =>
-  state && state.predictions ? state.predictions.plots !== null : false;
+  state && state.bias ? state.bias.plots !== null : false;
 
 const _getPlots = (state, keys = null) => {
-  if (!state || !state.predictions) return null;
-  let plots = state.predictions.plots;
+  if (!state || !state.bias) return null;
+  let plots = state.bias.plots;
   if (!plots) return null;
   keys = keys || [];
   for (let k of keys) {

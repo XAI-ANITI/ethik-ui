@@ -1,18 +1,18 @@
-require("../../../sass/Predictions.scss");
+require("../../../sass/Bias.scss");
 
 import React from "react";
 import { connect } from "react-redux";
 import FontAwesome from "react-fontawesome";
 
 import { isCurrentView } from "../../redux/app/selectors";
-import { isExplained } from "../../redux/predictions/selectors";
+import { isExplained } from "../../redux/bias/selectors";
 
 import Configure from "./Configure";
 import PlotRanking from "./PlotRanking";
 import PlotAllFeatures from "./PlotAllFeatures";
 import PlotFeature from "./PlotFeature";
 
-function Predictions(props) {
+function Bias(props) {
   if (!props.isViewed) {
     return null;
   }
@@ -52,7 +52,7 @@ function Predictions(props) {
 
 export default connect(
   state => ({
-    isViewed: isCurrentView(state, "PREDICTIONS"), 
+    isViewed: isCurrentView(state, "BIAS"), 
     isExplained: isExplained(state),
   }),
-)(Predictions);
+)(Bias);

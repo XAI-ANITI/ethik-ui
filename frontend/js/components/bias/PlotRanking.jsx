@@ -2,8 +2,8 @@ import React from "react";
 import { connect } from "react-redux";
 import Plot from "react-plotly.js";
 
-import { getRankingPlot, getSelectedLabel } from "../../redux/predictions/selectors";
-import { selectFeature } from "../../redux/predictions/reducer";
+import { getRankingPlot, getSelectedLabel } from "../../redux/bias/selectors";
+import { selectFeature } from "../../redux/bias/reducer";
 
 function PlotRanking(props) {
   const handleClick = (data) => {

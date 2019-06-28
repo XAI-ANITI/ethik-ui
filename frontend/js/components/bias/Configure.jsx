@@ -2,8 +2,8 @@ import React from "react";
 import { connect } from "react-redux";
 
 import { getPredLabelsCols } from "../../redux/dataset/selectors";
-import { getSelectedLabel } from "../../redux/predictions/selectors";
-import { selectLabel } from "../../redux/predictions/reducer";
+import { getSelectedLabel } from "../../redux/bias/selectors";
+import { selectLabel } from "../../redux/bias/reducer";
 
 function Configure(props) {
   const handleChange = (e) => props.selectLabel({ label: e.target.value });

@@ -60,7 +60,7 @@ def check_dataset(request):
     return JsonResponse(dict(errors=errors))
 
 
-def explain_predictions(f, features_cols, pred_labels_cols):
+def explain_bias(f, features_cols, pred_labels_cols):
     # TODO: check args (see check_dataset())
     data = read_ds(f)
     X = data.loc[:, features_cols]
@@ -73,7 +73,7 @@ def explain_predictions(f, features_cols, pred_labels_cols):
     )
 
 
-def plot_predictions(request):
+def plot_bias(request):
     try:
         f = request.FILES["file"]
         features_cols = request.FILES["features_cols"]
@@ -88,7 +88,7 @@ def plot_predictions(request):
         return HttpResponseBadRequest(e)
 
     try:
-        predictions, ranking = explain_predictions(f, features_cols, pred_labels_cols)
+        bias, ranking = explain_bias(f, features_cols, pred_labels_cols)
     except ValueError as e:
         return HttpResponseBadRequest(e)
 
@@ -105,12 +105,12 @@ def plot_predictions(request):
         }
         
         feat_figures = ethik.Explainer.make_predictions_fig(
-            predictions.query(f"label == '{label}'"),
+            bias.query(f"label == '{label}'"),
             with_taus=False,
             colors=feat_to_color,
         )
         tau_figure = ethik.Explainer.make_predictions_fig(
-            predictions.query(f"label == '{label}'"),
+            bias.query(f"label == '{label}'"),
             with_taus=True,
             colors=feat_to_color,
         )
