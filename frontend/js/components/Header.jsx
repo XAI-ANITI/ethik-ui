@@ -8,7 +8,7 @@ import { getName as getDatasetName } from "../redux/dataset/selectors";
 import { getAllowedViews } from "../redux/app/selectors";
 import { VIEWS } from "../redux/app/shared";
 import LoadDataset from "./dataset/Load";
-import ViewsList from "./ViewsList";
+import Nav from "./Nav";
 
 function Header(props) {
   const viewsList = props.allowedViews.remove(VIEWS.get("DATASET"));
@@ -17,11 +17,10 @@ function Header(props) {
       <h1>
         <a href="/">Ethik</a>
       </h1>
-      <div className="dataset">
-        {props.datasetName && props.datasetName}
-      </div>
-      <div className="views_list">
-        <ViewsList views={viewsList} />
+      <div className="nav">
+        {props.datasetName &&
+          <Nav datasetName={props.datasetName} views={viewsList} />
+        }
       </div>
       <LoadDataset mimeTypes={["text/csv"]} light>
         <FontAwesome
