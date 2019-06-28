@@ -21,9 +21,9 @@ function Nav(props) {
   }
 
   return (
-    <div>
+    <>
       Explain {viewElement} on <span className="dataset">{props.datasetName}</span>
-    </div>
+    </>
   );
 }
 

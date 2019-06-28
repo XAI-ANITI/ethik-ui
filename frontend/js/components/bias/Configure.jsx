@@ -1,22 +1,26 @@
 import React from "react";
 import { connect } from "react-redux";
+import Select from "react-select";
 
 import { getPredLabelsCols } from "../../redux/dataset/selectors";
 import { getSelectedLabel } from "../../redux/bias/selectors";
 import { selectLabel } from "../../redux/bias/reducer";
 
 function Configure(props) {
-  const handleChange = (e) => props.selectLabel({ label: e.target.value });
-  return (
-    <div>
-      {props.labels.size > 1 && props.selectedLabel &&
-        <select value={props.selectedLabel} onChange={handleChange}>
-          {props.labels.map(
-            label => <option key={label} value={label}>{label}</option>
-          )}
-        </select>
-      }
-    </div>
+  const handleChange = (sel) => props.selectLabel({ label: sel.value });
+  return (props.labels.size > 1 && props.selectedLabel &&
+    <>
+      <label>Class:</label>
+      <Select
+        value={{ value: props.selectedLabel, label: props.selectedLabel }}
+        onChange={handleChange}
+        options={props.labels.toArray().map(
+          label => ({ value: label, label: label })
+        )}
+        className="Select"
+        isSearchable
+      />
+    </>
   );
 }
 

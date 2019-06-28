@@ -6,6 +6,17 @@
   .config {
     width: 300px;
     margin: auto;
+    display: flex;
+    align-items: center;
+
+    label {
+      margin-right: 10px;
+      font-size: 20px;
+    }
+
+    .Select {
+      flex-grow: 1;
+    }
   }
 
   .plots {
