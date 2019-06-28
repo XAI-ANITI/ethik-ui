@@ -131,7 +131,7 @@ def plot_bias(request):
     return JsonResponse(resp)
 
 
-def explain_metric(f, features_cols, pred_labels_cols, true_label_col):
+def explain_performance(f, features_cols, pred_labels_cols, true_label_col):
     # TODO: check args (see check_dataset())
     data = read_ds(f)
     X = data.loc[:, features_cols]
@@ -150,7 +150,7 @@ def explain_metric(f, features_cols, pred_labels_cols, true_label_col):
     )
 
 
-def plot_metric(request):
+def plot_performance(request):
     try:
         f = request.FILES["file"]
         features_cols = request.FILES["features_cols"]
@@ -166,7 +166,12 @@ def plot_metric(request):
         return HttpResponseBadRequest(e)
 
     try:
-        metric, ranking = explain_metric(f, features_cols, pred_labels_cols, true_label_col)
+        performance, ranking = explain_performance(
+            f,
+            features_cols,
+            pred_labels_cols,
+            true_label_col
+        )
     except ValueError as e:
         return HttpResponseBadRequest(e)
 

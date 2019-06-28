@@ -1,11 +1,11 @@
-require("../../../sass/Metric.scss");
+require("../../../sass/Performance.scss");
 
 import React from "react";
 import { connect } from "react-redux";
 
 import { isCurrentView } from "../../redux/app/selectors";
 
-function Metric(props) {
+function Performance(props) {
   if (!props.isViewed) {
     return null;
   }
@@ -19,6 +19,6 @@ function Metric(props) {
 
 export default connect(
   state => ({
-    isViewed: isCurrentView(state, "METRIC"), 
+    isViewed: isCurrentView(state, "PERFORMANCE"), 
   }),
-)(Metric);
+)(Performance);
