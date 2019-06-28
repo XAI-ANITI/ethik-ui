@@ -11,8 +11,8 @@ function Performance(props) {
   }
 
   return (
-    <div id="metric">
-      "metric"
+    <div id="performance">
+      "performance"
     </div>
   );
 }

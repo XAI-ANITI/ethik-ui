@@ -19,7 +19,7 @@ function Bias(props) {
 
   if (!props.isExplained) {
     return (
-      <div id="predictions">
+      <div id="bias">
         <div className="spinner">
           <FontAwesome
             name="spinner"
@@ -32,7 +32,7 @@ function Bias(props) {
   }
 
   return (
-    <div id="predictions">
+    <div id="bias">
       <div className="config">
         <Configure />
       </div>
