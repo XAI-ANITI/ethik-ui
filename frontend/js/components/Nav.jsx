@@ -1,21 +1,19 @@
 import React from "react";
-import { connect } from "react-redux";
-
-import { getView } from "../redux/app/selectors";
-import { changeView } from "../redux/app/reducer";
+import { withRouter } from "react-router";
 
 function Nav(props) {
-  if (!props.datasetName || !props.views.size || !props.views.has(props.view)) {
+  const url = props.location.pathname;
+  if (!props.datasetName || !props.views.size || !props.views.has(url)) {
     return null;
   }
 
-  const handleChange = (e) => props.changeView({ view: e.target.value });
+  const handleChange = (e) => props.history.push(e.target.value);
 
-  let viewElement = props.view;
+  let viewElement = props.views.get(url);
   if (props.views.size > 1) {
-    viewElement = (<select value={props.view} onChange={handleChange}>
+    viewElement = (<select value={url} onChange={handleChange}>
       {props.views.toArray().map(
-        name => <option key={name} value={name}>{name}</option>
+        ([url, name]) => <option key={name} value={url}>{name}</option>
       )}
     </select>);
   }
@@ -27,9 +25,4 @@ function Nav(props) {
   );
 }
 
-export default connect(
-  state => ({
-    view: getView(state),
-  }),
-  { changeView }
-)(Nav);
+export default withRouter(Nav);

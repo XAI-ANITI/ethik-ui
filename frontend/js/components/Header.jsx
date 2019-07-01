@@ -1,18 +1,16 @@
-require("../../sass/Header.scss");
-
 import React from "react";
 import { Link } from "react-router-dom";
 import FontAwesome from "react-fontawesome";
 import { connect } from "react-redux"
 
-import { getName as getDatasetName } from "../redux/dataset/selectors";
-import { getAllowedViews } from "../redux/app/selectors";
-import { VIEWS } from "../redux/app/shared";
+import {
+  getName as getDatasetName, 
+  getAllowedExplanationViews,
+} from "../redux/dataset/selectors";
 import LoadDataset from "./dataset/Load";
 import Nav from "./Nav";
 
 function Header(props) {
-  const viewsList = props.allowedViews.remove(VIEWS.get("DATASET"));
   return (
     <header>
       <h1>
@@ -20,7 +18,10 @@ function Header(props) {
       </h1>
       <div className="nav">
         {props.datasetName &&
-          <Nav datasetName={props.datasetName} views={viewsList} />
+          <Nav
+            datasetName={props.datasetName}
+            views={props.allowedExplanationViews}
+          />
         }
       </div>
       <LoadDataset mimeTypes={["text/csv"]} light>
@@ -35,6 +36,6 @@ function Header(props) {
 export default connect(
   state => ({
     datasetName: getDatasetName(state),
-    allowedViews: getAllowedViews(state),
+    allowedExplanationViews: getAllowedExplanationViews(state),
   })
 )(Header);

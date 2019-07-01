@@ -1,13 +1,15 @@
 import { createAction, handleActions } from "redux-actions";
 import Immutable from "immutable";
 
+import { URLS } from "../../constants";
 import { clear as clearBias } from "../bias/reducer";
 
 const _load = createAction("DATASET/LOAD");
-export function load(dataset) {
+export function load(payload) {
   return function(dispatch) {
-    dispatch(_load(dataset));
+    dispatch(_load(payload));
     dispatch(clearBias());
+    payload.history.push(URLS.get("CONFIGURE_DATASET"));
   }
 }
 export const configure = createAction("DATASET/CONFIGURE");
