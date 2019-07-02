@@ -44,6 +44,7 @@
     "react-fontawesome": "^1.6.1",
     "react-plotly.js": "^2.3.0",
     "react-redux": "^7.1.0",
+    "react-router-dom": "^5.0.1",
     "react-select": "^3.0.4",
     "redux": "^4.0.1",
     "redux-actions": "^2.6.5",

@@ -1,25 +1,23 @@
-require("../../../sass/Bias.scss");
-
 import React from "react";
 import { connect } from "react-redux";
 import FontAwesome from "react-fontawesome";
 
-import { isCurrentView } from "../../redux/app/selectors";
 import { isExplained } from "../../redux/bias/selectors";
+import { view } from "../../redux/bias/reducer";
 
 import Configure from "./Configure";
 import PlotRanking from "./PlotRanking";
 import PlotAllFeatures from "./PlotAllFeatures";
 import PlotFeature from "./PlotFeature";
 
-function Bias(props) {
-  if (!props.isViewed) {
-    return null;
+class Bias extends React.Component {
+  componentDidMount() {
+    this.props.view();
   }
 
-  if (!props.isExplained) {
-    return (
-      <div id="bias">
+  render() {
+    if (!this.props.isExplained) {
+      return (
         <div className="spinner">
           <FontAwesome
             name="spinner"
@@ -27,32 +25,32 @@ function Bias(props) {
             spin
           />
         </div>
-      </div>
+      );
+    }
+
+    return (
+      <>
+        <div className="config">
+          <Configure />
+        </div>
+        <div className="plots">
+          <div className="ranking">
+            <PlotRanking />
+          </div>
+          <div className="features">
+            <PlotAllFeatures />
+            <br />
+            <PlotFeature />
+          </div>
+        </div>
+      </>
     );
   }
-
-  return (
-    <div id="bias">
-      <div className="config">
-        <Configure />
-      </div>
-      <div className="plots">
-        <div className="ranking">
-          <PlotRanking />
-        </div>
-        <div className="features">
-          <PlotAllFeatures />
-          <br />
-          <PlotFeature />
-        </div>
-      </div>
-    </div>
-  );
 }
 
 export default connect(
   state => ({
-    isViewed: isCurrentView(state, "BIAS"), 
     isExplained: isExplained(state),
   }),
+  { view }
 )(Bias);

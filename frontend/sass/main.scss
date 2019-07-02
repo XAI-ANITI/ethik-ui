@@ -10,8 +10,149 @@ body {
   flex-direction: column;
 }
 
-#root, #app {
+#root {
   flex: 1;
   display: flex;
   flex-direction: column;
+}
+
+header {
+  padding: 20px;
+  border-bottom: 1px solid #000;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+
+  h1 {
+    margin: 0;
+    font-weight: normal;
+  }
+
+  .nav {
+    flex: 1;
+    text-align: center;
+    font-size: 20px;
+  }
+
+  .dropzone_container {
+    font-size: 25px;
+    color: #1da1f2;
+    cursor: pointer;
+  }
+}
+
+.dropzone {
+  cursor: pointer;
+}
+
+.page {
+  display: flex;
+  flex: 1;
+  justify-content: center;
+}
+
+#load_dataset {
+  align-items: center;
+
+  .dropzone_container {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+
+    .dropzone {
+      background: #fafafa;
+      border: 2px dashed #eeeeee;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      width: 50%;
+      height: 50%;
+    }
+  }
+}
+
+#configure_dataset {
+  align-items: center;
+  margin: auto;
+  text-align: right;
+
+  label {
+    font-size: 30px;
+  }
+
+  table {
+    border-collapse:separate; 
+    border-spacing: 0 40px;
+  }
+
+  .select_col {
+    min-width: 300px;
+  }
+
+  .Select {
+    display: inline-block;
+    width: 100%;
+    margin-left: 10px;
+    text-align: left;
+  }
+
+  input[type="submit"] {
+    cursor: pointer;
+    padding: 10px;
+  }
+
+  >div {
+    margin: 30px 0px;
+  }
+}
+
+#explain_bias {
+  display: flex;
+  flex: 1;
+
+  .config {
+    width: 300px;
+    margin: auto;
+    display: flex;
+    align-items: center;
+
+    label {
+      margin-right: 10px;
+      font-size: 20px;
+    }
+
+    .Select {
+      flex-grow: 1;
+    }
+  }
+
+  .plots {
+    flex: 1;
+
+    .plot {
+      display: inline-block;
+    }
+  }
+
+  .spinner {
+    text-align: center;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .plots {
+    display: flex;
+
+    >div {
+      flex-grow: 1;
+      text-align: center;
+    }
+  }
 }

@@ -2,9 +2,8 @@ import React, { useState } from "react";
 import Dropzone from "react-dropzone";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
+import { withRouter } from "react-router";
 
-import { changeView } from "../../redux/app/reducer"
-import { VIEWS } from "../../redux/app/shared"
 import { load as loadDataset } from "../../redux/dataset/reducer"
 import { readColumns } from "../../utils/dataset";
 
@@ -15,12 +14,12 @@ function Load(props) {
       name: file.name,
       file: file,
       columns: cols,
+      history: props.history
     }));
-    props.changeView({ view: VIEWS.get("DATASET") });
   }
 
   const accept = props.mimeTypes ? props.mimeTypes.join(", ") : null;
-  let className = "dropzone-container";
+  let className = "dropzone_container";
   if (props.light) {
     className += " light";
   }
@@ -51,7 +50,7 @@ Load.defaultProps = {
   light: false,
 };
 
-export default connect(
+export default withRouter(connect(
   null,
-  { loadDataset, changeView }
-)(Load);
+  { loadDataset }
+)(Load));
