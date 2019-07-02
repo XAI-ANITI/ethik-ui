@@ -51,6 +51,11 @@ header {
   justify-content: center;
 }
 
+.responsive_plot {
+  width: 100%;
+  height: 100%;
+}
+
 #load_dataset {
   align-items: center;
 
@@ -114,6 +119,7 @@ header {
 #explain_bias {
   display: flex;
   flex: 1;
+  flex-direction: column;
 
   .config {
     width: 300px;
@@ -148,11 +154,21 @@ header {
   }
 
   .plots {
-    display: flex;
+    flex-grow: 1;
 
     >div {
-      flex-grow: 1;
       text-align: center;
+    }
+
+    .features {
+      display: flex;
+      flex-wrap: wrap;
+
+      .responsive_plot {
+        flex-grow: 1;
+        width: 50%;
+        min-width: 450px;
+      }
     }
   }
 }

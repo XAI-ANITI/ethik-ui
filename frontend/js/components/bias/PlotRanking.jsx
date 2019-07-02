@@ -1,7 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
-import Plot from "react-plotly.js";
 
+import ResponsivePlot from "../ResponsivePlot";
 import { getRankingPlot, getSelectedLabel } from "../../redux/bias/selectors";
 import { selectFeature } from "../../redux/bias/reducer";
 
@@ -12,15 +12,11 @@ function PlotRanking(props) {
     props.selectFeature({ feature });
   }
 
-  if (props.plot === null) {
-    return null;
-  }
-
   return (
-    <Plot
-      data={props.plot.get("data").toJS()}
-      layout={props.plot.get("layout").toJS()}
-      onClick={handleClick}
+    <ResponsivePlot
+      plot={props.plot}
+      handleClick={handleClick}
+      style={{ maxHeight: "300px" }}
     />
   );
 }

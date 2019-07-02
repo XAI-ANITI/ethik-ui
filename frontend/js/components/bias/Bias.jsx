@@ -39,7 +39,6 @@ class Bias extends React.Component {
           </div>
           <div className="features">
             <PlotAllFeatures />
-            <br />
             <PlotFeature />
           </div>
         </div>
