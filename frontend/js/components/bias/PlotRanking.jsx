@@ -16,7 +16,6 @@ function PlotRanking(props) {
     <ResponsivePlot
       plot={props.plot}
       handleClick={handleClick}
-      style={{ maxHeight: "300px" }}
     />
   );
 }

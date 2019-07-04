@@ -160,6 +160,15 @@ header {
       text-align: center;
     }
 
+    .ranking {
+      text-align: left;
+
+      .responsive_plot {
+        max-width: 800px;
+        max-height: 200px;
+      }
+    }
+
     .features {
       display: flex;
       flex-wrap: wrap;
