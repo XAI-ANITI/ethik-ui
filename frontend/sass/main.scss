@@ -56,6 +56,78 @@ header {
   height: 100%;
 }
 
+.plots_page {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+
+  .config {
+    width: 300px;
+    margin: auto;
+    display: flex;
+    align-items: center;
+
+    label {
+      margin-right: 10px;
+      font-size: 20px;
+    }
+
+    .Select {
+      flex-grow: 1;
+    }
+  }
+
+  .plots {
+    flex: 1;
+
+    .plot {
+      display: inline-block;
+    }
+  }
+
+  .spinner {
+    text-align: center;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .plots {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+
+    >div {
+      text-align: center;
+    }
+
+    .ranking {
+      text-align: left;
+      height: 33%;
+      margin-bottom: 50px;
+
+      .responsive_plot {
+        max-width: 800px;
+      }
+    }
+
+    .features {
+      display: flex;
+      flex-wrap: wrap;
+      flex-grow: 1;
+      justify-content: center;
+      align-items: center;
+
+      .responsive_plot {
+        flex-grow: 1;
+        width: 50%;
+        min-width: 450px;
+      }
+    }
+  }
+}
+
 #load_dataset {
   align-items: center;
 
@@ -113,71 +185,5 @@ header {
 
   >div {
     margin: 30px 0px;
-  }
-}
-
-#explain_bias {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-
-  .config {
-    width: 300px;
-    margin: auto;
-    display: flex;
-    align-items: center;
-
-    label {
-      margin-right: 10px;
-      font-size: 20px;
-    }
-
-    .Select {
-      flex-grow: 1;
-    }
-  }
-
-  .plots {
-    flex: 1;
-
-    .plot {
-      display: inline-block;
-    }
-  }
-
-  .spinner {
-    text-align: center;
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    justify-content: center;
-  }
-
-  .plots {
-    flex-grow: 1;
-
-    >div {
-      text-align: center;
-    }
-
-    .ranking {
-      text-align: left;
-
-      .responsive_plot {
-        max-width: 800px;
-        max-height: 200px;
-      }
-    }
-
-    .features {
-      display: flex;
-      flex-wrap: wrap;
-
-      .responsive_plot {
-        flex-grow: 1;
-        width: 50%;
-        min-width: 450px;
-      }
-    }
   }
 }

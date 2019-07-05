@@ -55,7 +55,7 @@ function App(props) {
         !props.isDatasetConfigured ? (
           <Redirect to={URLS.get("CONFIGURE_DATASET")} /> 
         ) : (
-          <div id="explain_bias" className="page">
+          <div id="explain_bias" className="page plots_page">
             <Bias />
           </div>
         )
@@ -65,7 +65,7 @@ function App(props) {
         !props.isDatasetConfigured ? (
           <Redirect to={URLS.get("CONFIGURE_DATASET")} /> 
         ) : (
-          <div id="explain_performance" className="page">
+          <div id="explain_performance" className="page plots_page">
             <Performance />
           </div>
         )
