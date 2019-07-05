@@ -2,8 +2,8 @@ import React from "react";
 import { connect } from "react-redux";
 
 import ResponsivePlot from "../ResponsivePlot";
-import { getRankingPlot } from "../../redux/bias/selectors";
-import { selectFeature } from "../../redux/bias/reducer";
+import { getRankingPlot } from "../../redux/performance/selectors";
+import { selectFeature } from "../../redux/performance/reducer";
 
 function PlotRanking(props) {
   const handleClick = (data) => {

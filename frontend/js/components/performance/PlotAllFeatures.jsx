@@ -2,9 +2,9 @@ import React from "react";
 import { connect } from "react-redux";
 
 import ResponsivePlot from "../ResponsivePlot";
-import { getFeaturePlot } from "../../redux/bias/selectors";
+import { getAllFeaturesPlot } from "../../redux/performance/selectors";
 
-function PlotFeature(props) {
+function PlotAllFeatures(props) {
   return (
     <ResponsivePlot
       plot={props.plot}
@@ -14,6 +14,6 @@ function PlotFeature(props) {
 
 export default connect(
   state => ({
-    plot: getFeaturePlot(state),
+    plot: getAllFeaturesPlot(state),
   })
-)(PlotFeature);
+)(PlotAllFeatures);

@@ -2,41 +2,49 @@ import { createAction, handleActions } from "redux-actions";
 import Immutable from "immutable";
 
 import API from "../../api";
-import { getFeaturesCols, getPredLabelsCols, getFile } from "../dataset/selectors"; 
+import {
+  getFeaturesCols,
+  getPredLabelsCols,
+  getTrueLabelCol,
+  getFile
+} from "../dataset/selectors"; 
 
-const _loadPlots = createAction("BIAS/LOAD_PLOTS");
-export const selectFeature = createAction("BIAS/SELECT_FEATURE");
-export const selectLabel = createAction("BIAS/SELECT_LABEL");
-export const clear = createAction("BIAS/CLEAR");
+const _loadPlots = createAction("PERFORMANCE/LOAD_PLOTS");
+export const selectFeature = createAction("PERFORMANCE/SELECT_FEATURE");
+export const clear = createAction("PERFORMANCE/CLEAR");
 export const view = (payload) => {
   return function(dispatch, getState) {
     const state = getState();
     const features = getFeaturesCols(state).toArray();
-    const labels = getPredLabelsCols(state).toArray();
+    const predLabels = getPredLabelsCols(state).toArray();
+    const trueLabel = getTrueLabelCol(state);
+
+    if (!trueLabel) {
+      return;
+    }
 
     payload = payload || {};
     const feature = payload.feature || features[0];
-    const label = payload.label || labels[0];
 
     dispatch(selectFeature({ feature }));
-    dispatch(selectLabel({ label }));
 
-    if (state.bias.plots !== null) {
+    if (state.performance.plots !== null) {
       return;
     }
 
     const form = new FormData();
     form.append("file", getFile(state));
     form.append("pred_labels_cols", new Blob(
-      [JSON.stringify(labels)],
+      [JSON.stringify(predLabels)],
       { type: "application/json" }
     ));
+    form.append("true_label_col", trueLabel);
     form.append("features_cols", new Blob(
       [JSON.stringify(features)],
       { type: "application/json" }
     ));
 
-    API.post("plot_bias", form)
+    API.post("plot_performance", form)
     .then(
       (res) => dispatch(_loadPlots({ plots: res.data }))
     )
@@ -49,18 +57,14 @@ export const view = (payload) => {
 
 const INITIAL_STATE = new Immutable.Record({
   selectedFeature: null,
-  selectedLabel: null,
   plots: null,
 });
 
-const BiasReducer = handleActions(
+const PerformanceReducer = handleActions(
   {
     [selectFeature]: (state, { payload }) => {
       // TODO: check if feature exists
       return state.set("selectedFeature", payload.feature);
-    },
-    [selectLabel]: (state, { payload }) => {
-      return state.set("selectedLabel", payload.label);
     },
     [_loadPlots]: (state, { payload }) => {
       return state.set("plots", new Immutable.fromJS(payload.plots));
@@ -70,4 +74,4 @@ const BiasReducer = handleActions(
   INITIAL_STATE()
 );
 
-export default BiasReducer;
+export default PerformanceReducer;

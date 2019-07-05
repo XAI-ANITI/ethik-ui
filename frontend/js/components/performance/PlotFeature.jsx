@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 
 import ResponsivePlot from "../ResponsivePlot";
-import { getFeaturePlot } from "../../redux/bias/selectors";
+import { getFeaturePlot } from "../../redux/performance/selectors";
 
 function PlotFeature(props) {
   return (
