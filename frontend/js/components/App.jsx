@@ -5,7 +5,7 @@ import { connect } from "react-redux";
 import Header from "./Header";
 import ConfigureDataset from "./dataset/Configure";
 import LoadDataset from "./dataset/Load";
-import Performance from "./performance/Performance";
+import Performance from "./Performance";
 import Bias from "./bias/Bias";
 
 import { URLS } from "../constants";

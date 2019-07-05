@@ -2,13 +2,37 @@ import React from "react";
 import { connect } from "react-redux";
 import FontAwesome from "react-fontawesome";
 
-import { isExplained } from "../../redux/bias/selectors";
-import { view } from "../../redux/bias/reducer";
+import {
+  isExplained,
+  getRankingPlot,
+  getAllFeaturesPlot,
+  getFeaturePlot
+} from "../../redux/bias/selectors";
+import { view, selectFeature } from "../../redux/bias/reducer";
 
 import Configure from "./Configure";
-import PlotRanking from "./PlotRanking";
-import PlotAllFeatures from "./PlotAllFeatures";
-import PlotFeature from "./PlotFeature";
+import UnconnectedPlotRanking from "../plots/PlotRanking";
+import UnconnectedPlotAllFeatures from "../plots/PlotAllFeatures";
+import UnconnectedPlotFeature from "../plots/PlotFeature";
+
+const PlotRanking = connect(
+  state => ({
+    plot: getRankingPlot(state),
+  }),
+  { selectFeature }
+)(UnconnectedPlotRanking);
+
+const PlotAllFeatures = connect(
+  state => ({
+    plot: getAllFeaturesPlot(state),
+  })
+)(UnconnectedPlotAllFeatures);
+
+const PlotFeature = connect(
+  state => ({
+    plot: getFeaturePlot(state),
+  })
+)(UnconnectedPlotFeature);
 
 class Bias extends React.Component {
   componentDidMount() {

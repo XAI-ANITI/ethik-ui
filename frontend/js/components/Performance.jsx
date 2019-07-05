@@ -2,12 +2,36 @@ import React from "react";
 import { connect } from "react-redux";
 import FontAwesome from "react-fontawesome";
 
-import { isExplained } from "../../redux/performance/selectors";
-import { view } from "../../redux/performance/reducer";
+import {
+  isExplained,
+  getRankingPlot,
+  getAllFeaturesPlot,
+  getFeaturePlot
+} from "../redux/performance/selectors";
+import { view, selectFeature } from "../redux/performance/reducer";
 
-import PlotRanking from "./PlotRanking";
-import PlotAllFeatures from "./PlotAllFeatures";
-import PlotFeature from "./PlotFeature";
+import UnconnectedPlotRanking from "./plots/PlotRanking";
+import UnconnectedPlotAllFeatures from "./plots/PlotAllFeatures";
+import UnconnectedPlotFeature from "./plots/PlotFeature";
+
+const PlotRanking = connect(
+  state => ({
+    plot: getRankingPlot(state),
+  }),
+  { selectFeature }
+)(UnconnectedPlotRanking);
+
+const PlotAllFeatures = connect(
+  state => ({
+    plot: getAllFeaturesPlot(state),
+  })
+)(UnconnectedPlotAllFeatures);
+
+const PlotFeature = connect(
+  state => ({
+    plot: getFeaturePlot(state),
+  })
+)(UnconnectedPlotFeature);
 
 class Performance extends React.Component {
   componentDidMount() {
