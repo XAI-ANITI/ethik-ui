@@ -138,15 +138,16 @@ def explain_performance(f, features_cols, pred_labels_cols, true_label_col):
     y_pred = data[pred_labels_cols]
     y_true = data[true_label_col]
     explainer = ethik.Explainer().fit(X)
+    explanation = explainer.explain_metric(
+        X,
+        y_true,
+        y_pred if len(pred_labels_cols) == 1 else y_pred.idxmax(axis="columns"),
+        metrics.accuracy_score # TODO: let the user choose
+    )
 
     return (
-        explainer.explain_metric(
-            X,
-            y_true,
-            y_pred if len(pred_labels_cols) == 1 else y_pred.idxmax(axis="columns"),
-            metrics.accuracy_score # TODO
-        ),
-        explainer.explain_importances(X, y_pred) # TODO: performance_ranking()
+        explanation,    
+        explainer.performance_ranking(explanation)
     )
 
 
@@ -175,7 +176,10 @@ def plot_performance(request):
     except ValueError as e:
         return HttpResponseBadRequest(e)
     
-    sorted_features = ranking.sort_values(by=["importance"])["feature"].unique() # TODO
+    ranking_criterion = "min_score"
+    sorted_features = ranking.sort_values(
+        by=[ranking_criterion]
+    )["feature"].unique()
     colors = interp_color(len(sorted_features))
     feat_to_color = {
         feat: color
@@ -192,8 +196,9 @@ def plot_performance(request):
         with_taus=True,
         colors=feat_to_color,
     )
-    ranking_figure = ethik.Explainer.make_importances_fig( # TODO
+    ranking_figure = ethik.Explainer.make_performance_ranking_fig(
         ranking,
+        ranking_criterion,
         colors=colors
     )
 
