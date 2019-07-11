@@ -1,4 +1,4 @@
-age,education-num,hours-per-week,y,y_hat
+age,education-num,hours-per-week,>50k,>50k_hat
 27,10,38,0,0
 45,9,40,0,0
 29,13,55,1,1

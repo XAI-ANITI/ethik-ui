@@ -1,4 +1,4 @@
-sepal length (cm),sepal width (cm),petal length (cm),petal width (cm),y,setosa,versicolor,virginica
+sepal length (cm),sepal width (cm),petal length (cm),petal width (cm),true_label,setosa,versicolor,virginica
 6.1,2.8,4.7,1.2,versicolor,0.0,1.0,0.0
 5.7,3.8,1.7,0.3,setosa,1.0,0.0,0.0
 7.7,2.6,6.9,2.3,virginica,0.0,0.0,1.0

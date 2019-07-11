@@ -65,11 +65,11 @@ def explain_bias(f, features_cols, pred_labels_cols):
     data = read_ds(f)
     X = data.loc[:, features_cols]
     y_pred = data[pred_labels_cols]
-    explainer = ethik.Explainer().fit(X)
+    explainer = ethik.Explainer()
 
     return (
-        explainer.explain_predictions(X, y_pred),
-        explainer.explain_importances(X, y_pred)
+        explainer.explain_bias(X, y_pred),
+        explainer.rank_by_bias(X, y_pred)
     )
 
 
@@ -90,6 +90,7 @@ def plot_bias(request):
     try:
         bias, ranking = explain_bias(f, features_cols, pred_labels_cols)
     except ValueError as e:
+        raise e
         return HttpResponseBadRequest(e)
 
     labels = ranking["label"].unique()
@@ -104,17 +105,17 @@ def plot_bias(request):
             for feat, color in zip(sorted_features, colors)
         }
         
-        feat_figures = ethik.Explainer.make_predictions_fig(
+        feat_figures = ethik.Explainer.make_bias_fig(
             bias.query(f"label == '{label}'"),
             with_taus=False,
             colors=feat_to_color,
         )
-        tau_figure = ethik.Explainer.make_predictions_fig(
+        tau_figure = ethik.Explainer.make_bias_fig(
             bias.query(f"label == '{label}'"),
             with_taus=True,
             colors=feat_to_color,
         )
-        ranking_figure = ethik.Explainer.make_importances_fig(
+        ranking_figure = ethik.Explainer.make_bias_ranking_fig(
             ranking.query(f"label == '{label}'"),
             colors=colors
         )
@@ -137,17 +138,14 @@ def explain_performance(f, features_cols, pred_labels_cols, true_label_col):
     X = data.loc[:, features_cols]
     y_pred = data[pred_labels_cols]
     y_true = data[true_label_col]
-    explainer = ethik.Explainer().fit(X)
-    explanation = explainer.explain_metric(
-        X,
-        y_true,
-        y_pred if len(pred_labels_cols) == 1 else y_pred.idxmax(axis="columns"),
-        metrics.accuracy_score # TODO: let the user choose
-    )
+    explainer = ethik.Explainer()
+    if len(pred_labels_cols) > 1:
+        y_pred = y_pred.idxmax(axis="columns")
+    metric = metrics.accuracy_score # TODO: let the user choose
 
     return (
-        explanation,    
-        explainer.performance_ranking(explanation)
+        explainer.explain_performance(X, y_true, y_pred, metric),
+        explainer.rank_by_performance(X, y_true, y_pred, metric)
     )
 
 
@@ -186,12 +184,12 @@ def plot_performance(request):
         for feat, color in zip(sorted_features, colors)
     }
     
-    feat_figures = ethik.Explainer.make_metric_fig(
+    feat_figures = ethik.Explainer.make_performance_fig(
         performance,
         with_taus=False,
         colors=feat_to_color,
     )
-    tau_figure = ethik.Explainer.make_metric_fig(
+    tau_figure = ethik.Explainer.make_performance_fig(
         performance,
         with_taus=True,
         colors=feat_to_color,
