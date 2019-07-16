@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 import Select from "react-select";
 
-import { getPredLabelsCols } from "../../redux/dataset/selectors";
+import { getPredYCols } from "../../redux/dataset/selectors";
 import { getSelectedLabel } from "../../redux/bias/selectors";
 import { selectLabel } from "../../redux/bias/reducer";
 
@@ -26,7 +26,7 @@ function Configure(props) {
 
 export default connect(
   state => ({
-    labels: getPredLabelsCols(state),
+    labels: getPredYCols(state),
     selectedLabel: getSelectedLabel(state),
   }),
   { selectLabel }

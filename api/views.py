@@ -20,9 +20,10 @@ def check_dataset(request):
         return HttpResponseBadRequest(e)
 
     try:
-        true_label_col = body["true_label_col"]
-        pred_labels_cols = body["pred_labels_cols"]
-        cols = body["columns"]
+        true_y_col = body["true_y_col"]
+        pred_y_cols = set(body["pred_y_cols"])
+        quantitative_x_cols = set(body["quantitative_x_cols"])
+        qualitative_x_cols = set(body["qualitative_x_cols"])
     except KeyError as e:
         return HttpResponseBadRequest(
             f"Cannot find key '{e}'"
@@ -32,39 +33,47 @@ def check_dataset(request):
 
     # TODO: check types (with jsonschema?)
 
-    if not pred_labels_cols:
-        errors.append("pred_labels_cols must not be empty")
+    if not pred_y_cols:
+        errors.append("pred_y_cols must not be empty")
 
-    if true_label_col in pred_labels_cols:
+    if true_y_col in pred_y_cols:
         errors.append(
-            f"True label col '{true_label_col}' cannot be one of the "
-            f"pred labels cols: {pred_labels_cols}"
+            f"True y col '{true_y_col}' cannot be one of the "
+            f"pred y cols: {pred_y_cols}"
         )
 
-    features_cols = set(cols) - set(pred_labels_cols) - set([true_label_col])
+    features_cols = quantitative_x_cols | qualitative_x_cols
     if not features_cols:
-        errors.append("features columns must not be empty")
-
-    if true_label_col in features_cols:
         errors.append(
-            f"True label col '{true_label_col}' cannot be one of the "
+            "One of quantitative_x_cols and quantitative_x_cols must not be empty"
+        )
+
+    if quantitative_x_cols & qualitative_x_cols:
+        errors.append(
+            "These features cannot be both quantitative and qualitative: "
+            (quantitative_x_cols & qualitative_x_cols)
+        )
+
+    if true_y_col in features_cols:
+        errors.append(
+            f"True y col '{true_y_col}' cannot be one of the "
             f"features cols: {features_cols}"
         )
 
-    if set(features_cols) & set(pred_labels_cols):
+    if features_cols & pred_y_cols:
         errors.append(
-            f"Pred labels cols {pred_labels_cols} cannot share elements with "
+            f"Pred y cols {pred_y_cols} cannot share elements with "
             f"features cols {features_cols}"
         )
 
     return JsonResponse(dict(errors=errors))
 
 
-def explain_bias(f, features_cols, pred_labels_cols):
+def explain_bias(f, features_cols, pred_y_cols):
     # TODO: check args (see check_dataset())
     data = read_ds(f)
     X = data.loc[:, features_cols]
-    y_pred = data[pred_labels_cols]
+    y_pred = data[pred_y_cols]
     explainer = ethik.Explainer()
 
     return (
@@ -77,18 +86,18 @@ def plot_bias(request):
     try:
         f = request.FILES["file"]
         features_cols = request.FILES["features_cols"]
-        pred_labels_cols = request.FILES["pred_labels_cols"]
+        pred_y_cols = request.FILES["pred_y_cols"]
     except KeyError as e:
         return HttpResponseBadRequest(f"Cannot find key '{e}'")
 
     try:
         features_cols = json.loads(features_cols.read().decode())
-        pred_labels_cols = json.loads(pred_labels_cols.read().decode())
+        pred_y_cols = json.loads(pred_y_cols.read().decode())
     except json.decoder.JSONDecodeError as e:
         return HttpResponseBadRequest(e)
 
     try:
-        bias, ranking = explain_bias(f, features_cols, pred_labels_cols)
+        bias, ranking = explain_bias(f, features_cols, pred_y_cols)
     except ValueError as e:
         raise e
         return HttpResponseBadRequest(e)
@@ -132,14 +141,14 @@ def plot_bias(request):
     return JsonResponse(resp)
 
 
-def explain_performance(f, features_cols, pred_labels_cols, true_label_col):
+def explain_performance(f, features_cols, pred_y_cols, true_y_col):
     # TODO: check args (see check_dataset())
     data = read_ds(f)
     X = data.loc[:, features_cols]
-    y_pred = data[pred_labels_cols]
-    y_true = data[true_label_col]
+    y_pred = data[pred_y_cols]
+    y_true = data[true_y_col]
     explainer = ethik.Explainer()
-    if len(pred_labels_cols) > 1:
+    if len(pred_y_cols) > 1:
         y_pred = y_pred.idxmax(axis="columns")
     metric = metrics.accuracy_score # TODO: let the user choose
 
@@ -153,14 +162,14 @@ def plot_performance(request):
     try:
         f = request.FILES["file"]
         features_cols = request.FILES["features_cols"]
-        pred_labels_cols = request.FILES["pred_labels_cols"]
-        true_label_col = request.POST["true_label_col"]
+        pred_y_cols = request.FILES["pred_y_cols"]
+        true_y_col = request.POST["true_y_col"]
     except KeyError as e:
         return HttpResponseBadRequest(f"Cannot find key '{e}'")
 
     try:
         features_cols = json.loads(features_cols.read().decode())
-        pred_labels_cols = json.loads(pred_labels_cols.read().decode())
+        pred_y_cols = json.loads(pred_y_cols.read().decode())
     except json.decoder.JSONDecodeError as e:
         return HttpResponseBadRequest(e)
 
@@ -168,13 +177,13 @@ def plot_performance(request):
         performance, ranking = explain_performance(
             f,
             features_cols,
-            pred_labels_cols,
-            true_label_col
+            pred_y_cols,
+            true_y_col
         )
     except ValueError as e:
         return HttpResponseBadRequest(e)
     
-    ranking_criterion = "min_score"
+    ranking_criterion = "min"
     sorted_features = ranking.sort_values(
         by=[ranking_criterion]
     )["feature"].unique()
@@ -196,6 +205,7 @@ def plot_performance(request):
     )
     ranking_figure = ethik.Explainer.make_performance_ranking_fig(
         ranking,
+        "accuracy",
         ranking_criterion,
         colors=colors
     )

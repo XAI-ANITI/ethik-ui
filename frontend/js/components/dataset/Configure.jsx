@@ -11,18 +11,25 @@ import { getColumns } from "../../redux/dataset/selectors";
 
 function Configure(props) {
   const [isChecking, setIsChecking] = useState(false);
-  const [predLabelsCols, setPredLabelsCols] = useState(
+  const [predYCols, setPredYCols] = useState(
     new OrderedSet([props.columns.last()])
   );
-  const [trueLabelCol, setTrueLabelCol] = useState(null);
+  const [qualitativeXCols, setQualitativeXCols] = useState(
+    new OrderedSet([])
+  );
+  const [quantitativeXCols, setQuantitativeXCols] = useState(
+    new OrderedSet(props.columns.butLast())
+  );
+  const [trueYCol, setTrueYCol] = useState(null);
 
   const configure = () => {
     setIsChecking(true);
 
     API.post(props.checkEndpoint, {
-      columns: props.columns.toJS(),
-      pred_labels_cols: predLabelsCols.toJS(),
-      true_label_col: trueLabelCol,
+      quantitative_x_cols: quantitativeXCols.toJS(),
+      qualitative_x_cols: qualitativeXCols.toJS(),
+      pred_y_cols: predYCols.toJS(),
+      true_y_col: trueYCol,
     })
     .then(function (res) {
       setIsChecking(false);
@@ -34,8 +41,10 @@ function Configure(props) {
       }
 
       props.configure({
-        trueLabelCol: trueLabelCol,
-        predLabelsCols: predLabelsCols,
+        trueYCol,
+        predYCols,
+        quantitativeXCols,
+        qualitativeXCols,
       });
     })
     .catch(function (e) {
@@ -56,63 +65,123 @@ function Configure(props) {
     );
   }
 
-  if (predLabelsCols.includes(trueLabelCol)) {
-    setTrueLabelCol(null);
+  if (predYCols.includes(trueYCol)) {
+    setTrueYCol(null);
   }
 
   const optionsPred = props.columns.toArray().map(
     c => ({ value: c, label: c })
   );
 
-  const options = props.columns.toArray().filter(
-    col => !predLabelsCols.includes(col)
-  ).map(
+  const options = props.columns.toArray().filter(col => (
+    !predYCols.includes(col) &&
+    !quantitativeXCols.includes(col) &&
+    !qualitativeXCols.includes(col)
+  )).map(
     c => ({ value: c, label: c })
   );
 
   return (
     <form className="configure" onSubmit={configure}>
-      <table>
-        <tbody>
-          <tr>
-            <td>
-              <label>Ŷ:</label>
-            </td>
-            <td className="select_col">
-              <Select
-                value={predLabelsCols.toArray().map(
-                  name => ({ value: name, label: name })
-                )}
-                onChange={
-                  (sel) => setPredLabelsCols(new OrderedSet(sel.map(opt => opt.value)))
-                }
-                options={optionsPred}
-                className="Select"
-                isSearchable
-                isMulti
-              />
-            </td>
-          </tr>
-          
-          <tr>
-            <td>
-              <label>Y:</label>
-            </td>
-            <td className="select_col">
-              <Select
-                value={{ value: trueLabelCol, label: trueLabelCol }}
-                onChange={
-                  (sel) => setTrueLabelCol(sel != null ? sel.value : null)
-                }
-                options={options}
-                className="Select"
-                isSearchable
-                isClearable
-              />
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <fieldset>
+        <legend>X</legend>
+        <table>
+          <tbody>
+            <tr>
+              <td>
+                <label>Quantitative:</label>
+              </td>
+              <td className="select_col">
+                <Select
+                  value={quantitativeXCols.toArray().map(
+                    name => ({ value: name, label: name })
+                  )}
+                  onChange={
+                    (sel) => setQuantitativeXCols(new OrderedSet(sel.map(opt => opt.value)))
+                  }
+                  options={optionsPred}
+                  className="Select"
+                  isSearchable
+                  isMulti
+                />
+              </td>
+            </tr>
+            <tr className="sep">
+              <td></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>
+                <label>Qualitative:</label>
+              </td>
+              <td className="select_col">
+                <Select
+                  value={qualitativeXCols.toArray().map(
+                    name => ({ value: name, label: name })
+                  )}
+                  onChange={
+                    (sel) => setQualitativeXCols(new OrderedSet(sel.map(opt => opt.value)))
+                  }
+                  options={optionsPred}
+                  className="Select"
+                  placeholder="Not supported yet"
+                  isSearchable
+                  isMulti
+                  isDisabled
+                />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </fieldset>
+
+      <fieldset>
+        <legend>Y</legend>
+        <table>
+          <tbody>
+            <tr>
+              <td>
+                <label>Predicted:</label>
+              </td>
+              <td className="select_col">
+                <Select
+                  value={predYCols.toArray().map(
+                    name => ({ value: name, label: name })
+                  )}
+                  onChange={
+                    (sel) => setPredYCols(new OrderedSet(sel.map(opt => opt.value)))
+                  }
+                  options={optionsPred}
+                  className="Select"
+                  isSearchable
+                  isMulti
+                />
+              </td>
+            </tr>
+            <tr className="sep">
+              <td></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>
+                <label>Real:</label>
+              </td>
+              <td className="select_col">
+                <Select
+                  value={{ value: trueYCol, label: trueYCol }}
+                  onChange={
+                    (sel) => setTrueYCol(sel != null ? sel.value : null)
+                  }
+                  options={options}
+                  className="Select"
+                  isSearchable
+                  isClearable
+                />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </fieldset>
 
       <input type="submit" value="Explain" />
     </form>

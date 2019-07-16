@@ -18,9 +18,10 @@ const INITIAL_STATE = new Immutable.Record({
   name: "",
   file: null,
   columns: new Immutable.OrderedSet(),
-  trueLabelCol: null,
-  predLabelsCols: new Immutable.OrderedSet(),
-  featuresCols: new Immutable.OrderedSet(),
+  trueYCol: null,
+  predYCols: new Immutable.OrderedSet(),
+  quantitativeXCols: new Immutable.OrderedSet(),
+  qualitativeXCols: new Immutable.OrderedSet(),
 });
 
 const DatasetReducer = handleActions(
@@ -31,18 +32,7 @@ const DatasetReducer = handleActions(
       columns: new Immutable.OrderedSet(payload.columns),
     }),
     [configure]: (state, { payload }) => {
-      const featuresCols = state.columns.subtract(
-        payload.predLabelsCols
-      ).subtract([
-        payload.trueLabelCol
-      ]);
-      return state.set(
-        "trueLabelCol", payload.trueLabelCol
-      ).set(
-        "predLabelsCols", payload.predLabelsCols
-      ).set(
-        "featuresCols", featuresCols
-      );
+      return state.merge(payload);
     },
   },
   INITIAL_STATE()

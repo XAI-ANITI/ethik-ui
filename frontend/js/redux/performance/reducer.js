@@ -4,8 +4,8 @@ import Immutable from "immutable";
 import API from "../../api";
 import {
   getFeaturesCols,
-  getPredLabelsCols,
-  getTrueLabelCol,
+  getPredYCols,
+  getTrueYCol,
   getFile
 } from "../dataset/selectors"; 
 
@@ -16,8 +16,8 @@ export const view = (payload) => {
   return function(dispatch, getState) {
     const state = getState();
     const features = getFeaturesCols(state).toArray();
-    const predLabels = getPredLabelsCols(state).toArray();
-    const trueLabel = getTrueLabelCol(state);
+    const predLabels = getPredYCols(state).toArray();
+    const trueLabel = getTrueYCol(state);
 
     if (!trueLabel) {
       return;
@@ -34,11 +34,11 @@ export const view = (payload) => {
 
     const form = new FormData();
     form.append("file", getFile(state));
-    form.append("pred_labels_cols", new Blob(
+    form.append("pred_y_cols", new Blob(
       [JSON.stringify(predLabels)],
       { type: "application/json" }
     ));
-    form.append("true_label_col", trueLabel);
+    form.append("true_y_col", trueLabel);
     form.append("features_cols", new Blob(
       [JSON.stringify(features)],
       { type: "application/json" }

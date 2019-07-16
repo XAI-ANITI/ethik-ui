@@ -158,22 +158,31 @@ header {
   margin: auto;
   text-align: right;
 
-  label {
+  fieldset {
+    margin-bottom: 20px;
+  }
+
+  legend {
     font-size: 30px;
+  }
+
+  label {
+    font-size: 18px;
   }
 
   table {
     border-collapse:separate; 
-    border-spacing: 0 40px;
-  }
 
-  .select_col {
-    min-width: 300px;
+    tr.sep td {
+      height: 40px;
+    }
   }
 
   .Select {
     display: inline-block;
     width: 100%;
+    max-width: 500px;
+    min-width: 300px;
     margin-left: 10px;
     text-align: left;
   }

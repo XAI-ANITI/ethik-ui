@@ -2,7 +2,7 @@ import { createAction, handleActions } from "redux-actions";
 import Immutable from "immutable";
 
 import API from "../../api";
-import { getFeaturesCols, getPredLabelsCols, getFile } from "../dataset/selectors"; 
+import { getFeaturesCols, getPredYCols, getFile } from "../dataset/selectors"; 
 
 const _loadPlots = createAction("BIAS/LOAD_PLOTS");
 export const selectFeature = createAction("BIAS/SELECT_FEATURE");
@@ -12,7 +12,7 @@ export const view = (payload) => {
   return function(dispatch, getState) {
     const state = getState();
     const features = getFeaturesCols(state).toArray();
-    const labels = getPredLabelsCols(state).toArray();
+    const labels = getPredYCols(state).toArray();
 
     payload = payload || {};
     const feature = payload.feature || features[0];
@@ -27,7 +27,7 @@ export const view = (payload) => {
 
     const form = new FormData();
     form.append("file", getFile(state));
-    form.append("pred_labels_cols", new Blob(
+    form.append("pred_y_cols", new Blob(
       [JSON.stringify(labels)],
       { type: "application/json" }
     ));
