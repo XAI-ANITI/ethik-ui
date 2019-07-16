@@ -1,36 +1,38 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import FontAwesome from "react-fontawesome";
-import Select from "react-select";
-import { OrderedSet } from "immutable";
+import Select from "react-select"; // TODO
+import { OrderedSet, Map } from "immutable";
+import { DndProvider } from "react-dnd";
+import HTML5Backend from "react-dnd-html5-backend";
 
+import Dustbin from "./Dustbin";
+import Box from "./Box";
 import API from "../../api";
 import { configure } from "../../redux/dataset/reducer";
 import { getColumns } from "../../redux/dataset/selectors";
 
 function Configure(props) {
   const [isChecking, setIsChecking] = useState(false);
-  const [predYCols, setPredYCols] = useState(
-    new OrderedSet([props.columns.last()])
-  );
-  const [qualitativeXCols, setQualitativeXCols] = useState(
-    new OrderedSet([])
-  );
-  const [quantitativeXCols, setQuantitativeXCols] = useState(
-    new OrderedSet(props.columns.butLast())
-  );
-  const [trueYCol, setTrueYCol] = useState(null);
+  const [columns, setColumns] = useState(new Map({
+    "excluded": new OrderedSet(),
+    "qualitative X": new OrderedSet(),
+    "quantitative X": new OrderedSet(props.columns.butLast()),
+    "predicted Y": new OrderedSet([props.columns.last()]),
+    "true Y": null,
+  }));
 
   const configure = () => {
     setIsChecking(true);
+    const cols = {
+      quantitative_x_cols: columns.get("quantitative X").toJS(),
+      qualitative_x_cols: columns.get("qualitative X").toJS(),
+      pred_y_cols: columns.get("predicted Y").toJS(),
+      true_y_col: columns.get("true Y"),
+    };
 
-    API.post(props.checkEndpoint, {
-      quantitative_x_cols: quantitativeXCols.toJS(),
-      qualitative_x_cols: qualitativeXCols.toJS(),
-      pred_y_cols: predYCols.toJS(),
-      true_y_col: trueYCol,
-    })
+    API.post(props.checkEndpoint, cols)
     .then(function (res) {
       setIsChecking(false);
 
@@ -41,10 +43,10 @@ function Configure(props) {
       }
 
       props.configure({
-        trueYCol,
-        predYCols,
-        quantitativeXCols,
-        qualitativeXCols,
+        trueYCol: cols.true_y_col,
+        predYCols: cols.pred_y_cols,
+        quantitativeXCols: cols.quantitative_x_cols,
+        qualitativeXCols: cols.qualitative_x_cols,
       });
     })
     .catch(function (e) {
@@ -52,6 +54,43 @@ function Configure(props) {
       alert("Errorrrrr: " + e);
     });
   };
+
+  const handleDrop = useCallback(
+    (groupKey, item) => {
+      const col = item.name;
+      let newColumns = columns;
+      let group;
+
+      // Remove col from previous group
+      for (let k of  columns.keySeq()) {
+        group = columns.get(k);
+        if (OrderedSet.isOrderedSet(group) && group.includes(col)) {
+          newColumns = newColumns.set(k, group.delete(col));
+        }
+        else if (group == col) {
+          newColumns = newColumns.set(k, null); 
+        }
+      }
+
+      // Add col to new group
+      group = columns.get(groupKey);
+      if (OrderedSet.isOrderedSet(group)) {
+        newColumns = newColumns.set(groupKey, group.add(col));
+      }
+      else {
+        if (group !== null) {
+          newColumns = newColumns.set(
+            "excluded",
+            newColumns.get("excluded").add(group)
+          );
+        }
+        newColumns = newColumns.set(groupKey, col);
+      }
+
+      setColumns(newColumns);
+    },
+    [columns]
+  );
 
   if (isChecking) {
     return (
@@ -65,126 +104,36 @@ function Configure(props) {
     );
   }
 
-  if (predYCols.includes(trueYCol)) {
-    setTrueYCol(null);
-  }
-
-  const optionsPred = props.columns.toArray().map(
-    c => ({ value: c, label: c })
-  );
-
-  const options = props.columns.toArray().filter(col => (
-    !predYCols.includes(col) &&
-    !quantitativeXCols.includes(col) &&
-    !qualitativeXCols.includes(col)
-  )).map(
-    c => ({ value: c, label: c })
-  );
+  const renderBoxes = (group) => {
+    if (OrderedSet.isOrderedSet(group)) {
+      return group.toArray().map(
+        name => <Box name={name} key={name} />
+      );
+    }
+    if (group === null) {
+      return null;
+    }
+    // group is true y
+    return <Box name={group} key={group} />
+  };
 
   return (
-    <form className="configure" onSubmit={configure}>
-      <fieldset>
-        <legend>X</legend>
-        <table>
-          <tbody>
-            <tr>
-              <td>
-                <label>Quantitative:</label>
-              </td>
-              <td className="select_col">
-                <Select
-                  value={quantitativeXCols.toArray().map(
-                    name => ({ value: name, label: name })
-                  )}
-                  onChange={
-                    (sel) => setQuantitativeXCols(new OrderedSet(sel.map(opt => opt.value)))
-                  }
-                  options={optionsPred}
-                  className="Select"
-                  isSearchable
-                  isMulti
-                />
-              </td>
-            </tr>
-            <tr className="sep">
-              <td></td>
-              <td></td>
-            </tr>
-            <tr>
-              <td>
-                <label>Qualitative:</label>
-              </td>
-              <td className="select_col">
-                <Select
-                  value={qualitativeXCols.toArray().map(
-                    name => ({ value: name, label: name })
-                  )}
-                  onChange={
-                    (sel) => setQualitativeXCols(new OrderedSet(sel.map(opt => opt.value)))
-                  }
-                  options={optionsPred}
-                  className="Select"
-                  placeholder="Not supported yet"
-                  isSearchable
-                  isMulti
-                  isDisabled
-                />
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </fieldset>
-
-      <fieldset>
-        <legend>Y</legend>
-        <table>
-          <tbody>
-            <tr>
-              <td>
-                <label>Predicted:</label>
-              </td>
-              <td className="select_col">
-                <Select
-                  value={predYCols.toArray().map(
-                    name => ({ value: name, label: name })
-                  )}
-                  onChange={
-                    (sel) => setPredYCols(new OrderedSet(sel.map(opt => opt.value)))
-                  }
-                  options={optionsPred}
-                  className="Select"
-                  isSearchable
-                  isMulti
-                />
-              </td>
-            </tr>
-            <tr className="sep">
-              <td></td>
-              <td></td>
-            </tr>
-            <tr>
-              <td>
-                <label>Real:</label>
-              </td>
-              <td className="select_col">
-                <Select
-                  value={{ value: trueYCol, label: trueYCol }}
-                  onChange={
-                    (sel) => setTrueYCol(sel != null ? sel.value : null)
-                  }
-                  options={options}
-                  className="Select"
-                  isSearchable
-                  isClearable
-                />
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </fieldset>
-
-      <input type="submit" value="Explain" />
-    </form>
+    <DndProvider backend={HTML5Backend}>
+      <form className="configure" onSubmit={configure}>
+        <div className="dnd">
+          {columns.toArray().map(([groupKey, group]) => (
+            <Dustbin
+              key={groupKey}
+              name={groupKey}
+              onDrop={item => handleDrop(groupKey, item)}
+            >
+              {renderBoxes(group)}
+            </Dustbin>
+          ))}
+        </div>
+        <input type="submit" value="Explain" />
+      </form>
+    </DndProvider>
   );
 }
 

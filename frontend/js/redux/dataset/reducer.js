@@ -32,7 +32,12 @@ const DatasetReducer = handleActions(
       columns: new Immutable.OrderedSet(payload.columns),
     }),
     [configure]: (state, { payload }) => {
-      return state.merge(payload);
+      return state.merge({
+        trueYCol: payload.trueYCol,
+        predYCols: new Immutable.OrderedSet(payload.predYCols),
+        quantitativeXCols: new Immutable.OrderedSet(payload.quantitativeXCols),
+        qualitativeXCols: new Immutable.OrderedSet(payload.qualitativeXCols),
+      });
     },
   },
   INITIAL_STATE()
