@@ -8,9 +8,7 @@ from sklearn import metrics
 from .utils import fig_to_json, interp_color, read_ds
 
 
-PREDICTIONS_SESSION_KEY = "predictions"
-IMPORTANCES_SESSION_KEY = "importances"
-METRIC_SESSION_KEY = "metric"
+METRIC = metrics.accuracy_score # TODO: let the user choose
 
 
 def check_dataset(request):
@@ -150,11 +148,10 @@ def explain_performance(f, features_cols, pred_y_cols, true_y_col):
     explainer = ethik.Explainer()
     if len(pred_y_cols) > 1:
         y_pred = y_pred.idxmax(axis="columns")
-    metric = metrics.accuracy_score # TODO: let the user choose
 
     return (
-        explainer.explain_performance(X, y_true, y_pred, metric),
-        explainer.rank_by_performance(X, y_true, y_pred, metric)
+        explainer.explain_performance(X, y_true, y_pred, METRIC),
+        explainer.rank_by_performance(X, y_true, y_pred, METRIC)
     )
 
 
@@ -197,17 +194,19 @@ def plot_performance(request):
         performance,
         with_taus=False,
         colors=feat_to_color,
+        metric=METRIC,
     )
     tau_figure = ethik.Explainer.make_performance_fig(
         performance,
         with_taus=True,
         colors=feat_to_color,
+        metric=METRIC,
     )
     ranking_figure = ethik.Explainer.make_performance_ranking_fig(
         ranking,
-        "accuracy",
-        ranking_criterion,
-        colors=colors
+        metric=METRIC,
+        criterion=ranking_criterion,
+        colors=colors,
     )
 
     return JsonResponse(dict(
