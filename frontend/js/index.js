@@ -1,3 +1,4 @@
+require("../sass/popup.scss");
 require("../sass/main.scss");
 
 import React from "react";

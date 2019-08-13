@@ -1,6 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 import FontAwesome from "react-fontawesome";
+import Popup from "react-popup";
 
 import {
   isExplained,
@@ -39,6 +40,42 @@ class Bias extends React.Component {
     this.props.view();
   }
 
+  showRankingHelp = (e) => {
+    e.preventDefault();
+    Popup.create({
+      title: "Help",
+      content: (
+        <div>
+        Ranking
+        </div>
+      ),
+    });
+  };
+
+  showNumericFeaturesHelp = (e) => {
+    e.preventDefault();
+    Popup.create({
+      title: "Help",
+      content: (
+        <div>
+        Numeric features
+        </div>
+      ),
+    });
+  };
+
+  showSingleFeatureHelp = (e) => {
+    e.preventDefault();
+    Popup.create({
+      title: "Help",
+      content: (
+        <div>
+        Single feature
+        </div>
+      ),
+    });
+  };
+
   render() {
     if (!this.props.isExplained) {
       return (
@@ -54,16 +91,43 @@ class Bias extends React.Component {
 
     return (
       <>
+        <Popup
+          title="Help"
+          className="mm-popup"
+          btnClass="mm-popup__btn"
+          closeBtn={true}
+          escToClose={true}
+        />
         <div className="config">
           <Configure />
         </div>
         <div className="plots">
-          <div className="ranking">
+          <div className="ranking plot_wrapper">
+            <div className="help_icon">
+              <a href="#" onClick={this.showRankingHelp}>
+                <FontAwesome name="question-circle" />
+              </a>
+            </div>
             <PlotRanking />
           </div>
+          <p className="help ranking_help">Click on bars to show details.</p>
           <div className="features">
-            <PlotAllFeatures />
-            <PlotFeature />
+            <div className="plot_wrapper">
+              <div className="help_icon">
+                <a href="#" onClick={this.showNumericFeaturesHelp}>
+                  <FontAwesome name="question-circle" />
+                </a>
+              </div>
+              <PlotAllFeatures />
+            </div>
+            <div className="plot_wrapper">
+              <div className="help_icon">
+                <a href="#" onClick={this.showSingleFeatureHelp}>
+                  <FontAwesome name="question-circle" />
+                </a>
+              </div>
+              <PlotFeature />
+            </div>
           </div>
         </div>
       </>

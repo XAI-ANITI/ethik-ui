@@ -10,6 +10,10 @@ body {
   flex-direction: column;
 }
 
+.js-plotly-plot .modebar {
+  display: none;
+}
+
 #root {
   flex: 1;
   display: flex;
@@ -60,6 +64,7 @@ header {
   display: flex;
   flex: 1;
   flex-direction: column;
+  position: relative;
 
   .config {
     width: 300px;
@@ -77,14 +82,6 @@ header {
     }
   }
 
-  .plots {
-    flex: 1;
-
-    .plot {
-      display: inline-block;
-    }
-  }
-
   .spinner {
     text-align: center;
     display: flex;
@@ -94,22 +91,57 @@ header {
   }
 
   .plots {
+    flex: 1;
     flex-grow: 1;
     display: flex;
     flex-direction: column;
+
+    .help {
+      margin: 0;
+      font-size: 12px;
+      color: rgba(0, 0, 0, 0.3);
+    }
+
+    .plot {
+      display: inline-block;
+    }
 
     >div {
       text-align: center;
     }
 
+    .plot_wrapper {
+      display: flex;
+      align-items: top;
+
+      .help_icon {
+        margin-top: 40px;
+        position: relative;
+        left: 20px;
+        z-index: 2;
+
+        a {
+          color: rgba(0, 0, 0, 0.2);
+        }
+      }
+
+      .js-plotly-plot {
+        flex-grow: 1;
+      }
+    }
+
     .ranking {
       text-align: left;
       height: 33%;
-      margin-bottom: 50px;
+      margin-bottom: 20px;
 
       .responsive_plot {
         max-width: 800px;
       }
+    }
+
+    .ranking_help {
+      margin-left: 200px;
     }
 
     .features {
@@ -119,7 +151,7 @@ header {
       justify-content: center;
       align-items: center;
 
-      .responsive_plot {
+      .plot_wrapper {
         flex-grow: 1;
         width: 50%;
         min-width: 450px;
