@@ -17,19 +17,46 @@ function Configure(props) {
   const [isChecking, setIsChecking] = useState(false);
   const [columns, setColumns] = useState(new Map({
     "excluded": new OrderedSet(),
-    "qualitative X": new OrderedSet(),
-    "quantitative X": new OrderedSet(props.columns.butLast()),
-    "predicted Y": new OrderedSet([props.columns.last()]),
-    "true Y": null,
+    "categorical": new OrderedSet(),
+    "numeric": new OrderedSet(props.columns.butLast()),
+    "predicted": new OrderedSet([props.columns.last()]),
+    "true": null,
   }));
+
+  const renderDustbin = (name, title) => {
+    if (title === undefined) {
+      title = name.charAt(0).toUpperCase() + name.slice(1);
+    }
+    return (
+      <Dustbin
+        name={title}
+        key={name}
+        onDrop={item => handleDrop(name, item)}
+      >
+        {renderBoxes(columns.get(name))}
+      </Dustbin>
+    );
+  };
+
+  const renderDustbinGroup = (title, columns) => {
+    const binTitle = columns.length == 1 ? "" : undefined;
+    return (
+      <div className="dustbin_group">
+        <p className="title">{title}</p>
+        <div className="dustbins">
+          {columns.map(name => renderDustbin(name, binTitle))}
+        </div>
+      </div>
+    );
+  };
 
   const configure = () => {
     setIsChecking(true);
     const cols = {
-      quantitative_x_cols: columns.get("quantitative X").toJS(),
-      qualitative_x_cols: columns.get("qualitative X").toJS(),
-      pred_y_cols: columns.get("predicted Y").toJS(),
-      true_y_col: columns.get("true Y"),
+      quantitative_x_cols: columns.get("numeric").toJS(),
+      qualitative_x_cols: columns.get("categorical").toJS(),
+      pred_y_cols: columns.get("predicted").toJS(),
+      true_y_col: columns.get("true"),
     };
 
     API.post(props.checkEndpoint, cols)
@@ -121,15 +148,9 @@ function Configure(props) {
     <DndProvider backend={HTML5Backend}>
       <form className="configure" onSubmit={configure}>
         <div className="dnd">
-          {columns.toArray().map(([groupKey, group]) => (
-            <Dustbin
-              key={groupKey}
-              name={groupKey}
-              onDrop={item => handleDrop(groupKey, item)}
-            >
-              {renderBoxes(group)}
-            </Dustbin>
-          ))}
+          {renderDustbinGroup("Excluded", ["excluded"])} 
+          {renderDustbinGroup("X", ["numeric", "categorical"])} 
+          {renderDustbinGroup("y", ["predicted", "true"])} 
         </div>
         <input type="submit" value="Explain" />
       </form>

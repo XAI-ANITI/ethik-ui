@@ -194,44 +194,61 @@ header {
     display: flex;
     margin-bottom: 20px;
 
-    .dustbin {
-      flex-grow: 1;
-      margin: 0 20px;
-      min-height: 100%;
-      min-width: 200px;
+    .dustbin_group {
       display: flex;
       flex-direction: column;
-      background: #fafafa;
-      border: 2px dashed #eeeeee;
-      padding: 10px;
 
       .title {
+        margin: 0 0 20px 0;
         text-align: center;
-        font-size: 20px;
+        font-size: 40px;
       }
 
-      .boxes {
-        border: 2px dashed #eeeeee;
-        background: white;
-        padding: 10px;
+      .dustbins {
+        display: flex;
         flex-grow: 1;
+        background: #fafafa;
+        border: 2px dashed #eeeeee;
+        margin: 0 20px;
+        
+        .dustbin {
+          flex-grow: 1;
+          margin: 0 10px;
+          min-width: 200px;
+          display: flex;
+          flex-direction: column;
+          padding: 10px;
+
+          .title {
+            text-align: center;
+            font-size: 20px;
+            margin: 5px 0;
+          }
+
+          .boxes {
+            border: 2px dashed #eeeeee;
+            background: white;
+            padding: 10px;
+            flex-grow: 1;
+          }
+        }
+
+        .dustbin.active .boxes {
+          background: #fafafa;
+        }
+
+        .box {
+          border: 1px solid #000;
+          background: #fafafa;
+          padding: 5px;
+          cursor: move;
+          margin: 5px 0;
+        }
+
+        .box.active {
+          opacity: 0.5;
+        }
       }
-    }
-
-    .dustbin.active .boxes {
-      background: #fafafa;
-    }
-
-    .box {
-      border: 1px solid #000;
-      background: #fafafa;
-      padding: 5px;
-      cursor: move;
-      margin: 5px 0;
-    }
-
-    .box.active {
-      opacity: 0.5;
     }
   }
 
