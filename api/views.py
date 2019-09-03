@@ -7,8 +7,9 @@ from sklearn import metrics
 
 from .utils import fig_to_json, interp_color, read_ds
 
-
-METRIC = metrics.accuracy_score # TODO: let the user choose
+# TODO: let the user choose
+METRIC = metrics.accuracy_score
+N_SAMPLES = 30
 
 
 def check_dataset(request):
@@ -67,14 +68,15 @@ def check_dataset(request):
     return JsonResponse(dict(errors=errors))
 
 
-def explain_bias(f, features_cols, pred_y_cols):
+def explain_bias(f, quantitative_cols, qualitative_cols, pred_y_cols):
     # TODO: check args (see check_dataset())
-    data = read_ds(f)
-    X = data.loc[:, features_cols]
+    data = read_ds(f, qualitative_cols)
+    X = data.loc[:, [*quantitative_cols, *qualitative_cols]]
     y_pred = data[pred_y_cols]
-    explainer = ethik.Explainer()
+    explainer = ethik.Explainer(n_samples=N_SAMPLES)
 
     return (
+        explainer,
         explainer.explain_bias(X, y_pred),
         explainer.rank_by_bias(X, y_pred)
     )
@@ -83,21 +85,22 @@ def explain_bias(f, features_cols, pred_y_cols):
 def plot_bias(request):
     try:
         f = request.FILES["file"]
-        features_cols = request.FILES["features_cols"]
+        quantitative_cols = request.FILES["quantitative_cols"]
+        qualitative_cols = request.FILES["qualitative_cols"]
         pred_y_cols = request.FILES["pred_y_cols"]
     except KeyError as e:
         return HttpResponseBadRequest(f"Cannot find key '{e}'")
 
     try:
-        features_cols = json.loads(features_cols.read().decode())
+        quantitative_cols = json.loads(quantitative_cols.read().decode())
+        qualitative_cols = json.loads(qualitative_cols.read().decode())
         pred_y_cols = json.loads(pred_y_cols.read().decode())
     except json.decoder.JSONDecodeError as e:
         return HttpResponseBadRequest(e)
 
     try:
-        bias, ranking = explain_bias(f, features_cols, pred_y_cols)
+        explainer, bias, ranking = explain_bias(f, quantitative_cols, qualitative_cols, pred_y_cols)
     except ValueError as e:
-        raise e
         return HttpResponseBadRequest(e)
 
     labels = ranking["label"].unique()
@@ -112,17 +115,17 @@ def plot_bias(request):
             for feat, color in zip(sorted_features, colors)
         }
         
-        feat_figures = ethik.Explainer.make_bias_fig(
+        feat_figures = explainer.make_bias_fig(
             bias.query(f"label == '{label}'"),
             with_taus=False,
             colors=feat_to_color,
         )
-        tau_figure = ethik.Explainer.make_bias_fig(
+        tau_figure = explainer.make_bias_fig(
             bias.query(f"label == '{label}'"),
             with_taus=True,
             colors=feat_to_color,
         )
-        ranking_figure = ethik.Explainer.make_bias_ranking_fig(
+        ranking_figure = explainer.make_bias_ranking_fig(
             ranking.query(f"label == '{label}'"),
             colors=colors
         )
@@ -139,17 +142,22 @@ def plot_bias(request):
     return JsonResponse(resp)
 
 
-def explain_performance(f, features_cols, pred_y_cols, true_y_col):
+def explain_performance(f, quantitative_cols, qualitative_cols, pred_y_cols, true_y_col):
     # TODO: check args (see check_dataset())
-    data = read_ds(f)
-    X = data.loc[:, features_cols]
+    data = read_ds(f, qualitative_cols)
+    X = data.loc[:, [*quantitative_cols, *qualitative_cols]]
     y_pred = data[pred_y_cols]
     y_true = data[true_y_col]
-    explainer = ethik.Explainer()
-    if len(pred_y_cols) > 1:
+    explainer = ethik.Explainer(n_samples=N_SAMPLES)
+    
+    # For accuracy only
+    if len(pred_y_cols) > 1: 
         y_pred = y_pred.idxmax(axis="columns")
+    else:
+        y_pred = (y_pred > 0.5).astype(int)
 
     return (
+        explainer,
         explainer.explain_performance(X, y_true, y_pred, METRIC),
         explainer.rank_by_performance(X, y_true, y_pred, METRIC)
     )
@@ -158,26 +166,30 @@ def explain_performance(f, features_cols, pred_y_cols, true_y_col):
 def plot_performance(request):
     try:
         f = request.FILES["file"]
-        features_cols = request.FILES["features_cols"]
+        quantitative_cols = request.FILES["quantitative_cols"]
+        qualitative_cols = request.FILES["qualitative_cols"]
         pred_y_cols = request.FILES["pred_y_cols"]
         true_y_col = request.POST["true_y_col"]
     except KeyError as e:
         return HttpResponseBadRequest(f"Cannot find key '{e}'")
 
     try:
-        features_cols = json.loads(features_cols.read().decode())
+        quantitative_cols = json.loads(quantitative_cols.read().decode())
+        qualitative_cols = json.loads(qualitative_cols.read().decode())
         pred_y_cols = json.loads(pred_y_cols.read().decode())
     except json.decoder.JSONDecodeError as e:
         return HttpResponseBadRequest(e)
 
     try:
-        performance, ranking = explain_performance(
+        explainer, performance, ranking = explain_performance(
             f,
-            features_cols,
+            quantitative_cols,
+            qualitative_cols,
             pred_y_cols,
             true_y_col
         )
     except ValueError as e:
+        raise e
         return HttpResponseBadRequest(e)
     
     ranking_criterion = "min"
@@ -190,19 +202,19 @@ def plot_performance(request):
         for feat, color in zip(sorted_features, colors)
     }
     
-    feat_figures = ethik.Explainer.make_performance_fig(
+    feat_figures = explainer.make_performance_fig(
         performance,
         with_taus=False,
         colors=feat_to_color,
         metric=METRIC,
     )
-    tau_figure = ethik.Explainer.make_performance_fig(
+    tau_figure = explainer.make_performance_fig(
         performance,
         with_taus=True,
         colors=feat_to_color,
         metric=METRIC,
     )
-    ranking_figure = ethik.Explainer.make_performance_ranking_fig(
+    ranking_figure = explainer.make_performance_ranking_fig(
         ranking,
         metric=METRIC,
         criterion=ranking_criterion,

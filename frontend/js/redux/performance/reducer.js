@@ -3,7 +3,8 @@ import Immutable from "immutable";
 
 import API from "../../api";
 import {
-  getFeaturesCols,
+  getQuantitativeXCols,
+  getQualitativeXCols,
   getPredYCols,
   getTrueYCol,
   getFile
@@ -15,7 +16,8 @@ export const clear = createAction("PERFORMANCE/CLEAR");
 export const view = (payload) => {
   return function(dispatch, getState) {
     const state = getState();
-    const features = getFeaturesCols(state).toArray();
+    const quantitativeFeatures = getQuantitativeXCols(state).toArray();
+    const qualitativeFeatures = getQualitativeXCols(state).toArray();
     const predLabels = getPredYCols(state).toArray();
     const trueLabel = getTrueYCol(state);
 
@@ -24,7 +26,7 @@ export const view = (payload) => {
     }
 
     payload = payload || {};
-    const feature = payload.feature || features[0];
+    const feature = payload.feature || quantitativeFeatures[0] || qualitativeFeatures[0];
 
     dispatch(selectFeature({ feature }));
 
@@ -39,8 +41,12 @@ export const view = (payload) => {
       { type: "application/json" }
     ));
     form.append("true_y_col", trueLabel);
-    form.append("features_cols", new Blob(
-      [JSON.stringify(features)],
+    form.append("quantitative_cols", new Blob(
+      [JSON.stringify(quantitativeFeatures)],
+      { type: "application/json" }
+    ));
+    form.append("qualitative_cols", new Blob(
+      [JSON.stringify(qualitativeFeatures)],
       { type: "application/json" }
     ));
 

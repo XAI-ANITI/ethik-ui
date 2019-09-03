@@ -2,7 +2,7 @@ import { createAction, handleActions } from "redux-actions";
 import Immutable from "immutable";
 
 import API from "../../api";
-import { getFeaturesCols, getPredYCols, getFile } from "../dataset/selectors"; 
+import { getQuantitativeXCols, getQualitativeXCols, getPredYCols, getFile } from "../dataset/selectors"; 
 
 const _loadPlots = createAction("BIAS/LOAD_PLOTS");
 export const selectFeature = createAction("BIAS/SELECT_FEATURE");
@@ -11,11 +11,12 @@ export const clear = createAction("BIAS/CLEAR");
 export const view = (payload) => {
   return function(dispatch, getState) {
     const state = getState();
-    const features = getFeaturesCols(state).toArray();
+    const quantitativeFeatures = getQuantitativeXCols(state).toArray();
+    const qualitativeFeatures = getQualitativeXCols(state).toArray();
     const labels = getPredYCols(state).toArray();
 
     payload = payload || {};
-    const feature = payload.feature || features[0];
+    const feature = payload.feature || quantitativeFeatures[0] || qualitativeFeatures[0];
     const label = payload.label || labels[0];
 
     dispatch(selectFeature({ feature }));
@@ -31,8 +32,12 @@ export const view = (payload) => {
       [JSON.stringify(labels)],
       { type: "application/json" }
     ));
-    form.append("features_cols", new Blob(
-      [JSON.stringify(features)],
+    form.append("quantitative_cols", new Blob(
+      [JSON.stringify(quantitativeFeatures)],
+      { type: "application/json" }
+    ));
+    form.append("qualitative_cols", new Blob(
+      [JSON.stringify(qualitativeFeatures)],
       { type: "application/json" }
     ));
 

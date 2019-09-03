@@ -6,11 +6,13 @@ import pandas as pd
 from plotly.utils import PlotlyJSONEncoder
 
 
-def read_ds(f):
+def read_ds(f, cat_features):
     ct = f.content_type
     if ct == "text/csv":
         with io.StringIO(f.read().decode()) as decoded:
-            return pd.read_csv(decoded)
+            df = pd.read_csv(decoded)
+            df[cat_features] = df[cat_features].apply(lambda col: col.astype("category"))
+            return df
     raise ValueError(f"Unsupported content type '{ct}'")
 
 
