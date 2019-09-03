@@ -205,6 +205,7 @@ header {
     .dustbin_group {
       display: flex;
       flex-direction: column;
+      margin: 0 20px;
 
       .title {
         margin: 0 0 20px 0;
@@ -246,17 +247,22 @@ header {
         }
 
         .box {
-          border: 1px solid #000;
+          border: 1px solid #eee;
           background: #fafafa;
           padding: 5px;
           cursor: move;
-          margin: 5px 0;
+          margin: 10px 0;
+          font-size: 14px;
         }
 
         .box.active {
           opacity: 0.5;
         }
       }
+    }
+
+    .dustbin_group.excluded .title {
+      opacity: 0.2;
     }
   }
 

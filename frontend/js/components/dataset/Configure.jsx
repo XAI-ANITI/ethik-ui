@@ -38,10 +38,11 @@ function Configure(props) {
     );
   };
 
-  const renderDustbinGroup = (title, columns) => {
+  const renderDustbinGroup = (title, columns, className = "") => {
     const binTitle = columns.length == 1 ? "" : undefined;
+    className += " dustbin_group";
     return (
-      <div className="dustbin_group">
+      <div className={className}>
         <p className="title">{title}</p>
         <div className="dustbins">
           {columns.map(name => renderDustbin(name, binTitle))}
@@ -148,7 +149,7 @@ function Configure(props) {
     <DndProvider backend={HTML5Backend}>
       <form className="configure" onSubmit={configure}>
         <div className="dnd">
-          {renderDustbinGroup("Excluded", ["excluded"])} 
+          {renderDustbinGroup("Excluded", ["excluded"], "excluded")} 
           {renderDustbinGroup("X", ["numeric", "categorical"])} 
           {renderDustbinGroup("y", ["predicted", "true"])} 
         </div>
