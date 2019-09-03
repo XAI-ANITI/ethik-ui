@@ -141,30 +141,28 @@ header {
     }
 
     .ranking {
-      text-align: left;
+      justify-content: center;
       height: 33%;
       margin-bottom: 20px;
 
-      .responsive_plot {
+      >div:not(.help_icon) {
+        text-align: right;
+        flex-grow: 1;
         max-width: 800px;
       }
     }
 
-    .ranking_help {
-      margin-left: 200px;
-    }
-
     .features {
       display: flex;
-      flex-wrap: wrap;
       flex-grow: 1;
       justify-content: center;
       align-items: center;
+      flex-wrap: wrap;
 
       .plot_wrapper {
-        flex-grow: 1;
-        width: 50%;
+        flex: 1;
         min-width: 450px;
+        padding: 0 40px;
       }
     }
   }

@@ -104,9 +104,11 @@ class Performance extends React.Component {
                 <FontAwesome name="question-circle" />
               </a>
             </div>
-            <PlotRanking />
+            <div>
+              <PlotRanking />
+              <p className="help ranking_help">Click on bars to show details.</p>
+            </div>
           </div>
-          <p className="help ranking_help">Click on bars to show details.</p>
           <div className="features">
             <div className="plot_wrapper">
               <div className="help_icon">
