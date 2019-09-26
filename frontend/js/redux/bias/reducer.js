@@ -2,7 +2,13 @@ import { createAction, handleActions } from "redux-actions";
 import Immutable from "immutable";
 
 import API from "../../api";
-import { getQuantitativeXCols, getQualitativeXCols, getPredYCols, getFile } from "../dataset/selectors"; 
+import {
+  getQuantitativeXCols,
+  getQualitativeXCols,
+  getPredYCols,
+  getFile,
+  isRegression
+} from "../dataset/selectors"; 
 
 const _loadPlots = createAction("BIAS/LOAD_PLOTS");
 export const selectFeature = createAction("BIAS/SELECT_FEATURE");
@@ -14,6 +20,7 @@ export const view = (payload) => {
     const quantitativeFeatures = getQuantitativeXCols(state).toArray();
     const qualitativeFeatures = getQualitativeXCols(state).toArray();
     const labels = getPredYCols(state).toArray();
+    const isRegression_ = isRegression(state);
 
     payload = payload || {};
     const feature = payload.feature || quantitativeFeatures[0] || qualitativeFeatures[0];
@@ -40,6 +47,9 @@ export const view = (payload) => {
       [JSON.stringify(qualitativeFeatures)],
       { type: "application/json" }
     ));
+    if (isRegression_) {
+      form.append("is_regression", "");
+    }
 
     API.post("plot_bias", form)
     .then(

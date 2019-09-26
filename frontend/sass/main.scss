@@ -127,7 +127,6 @@ header {
       .help_icon {
         margin-top: 40px;
         position: relative;
-        left: 20px;
         z-index: 2;
 
         a {
@@ -197,6 +196,19 @@ header {
   align-items: center;
   margin: auto;
   text-align: center;
+
+  .problem_type {
+    margin: 50px 0;
+    font-size: 18px;
+
+    label {
+      margin-right: 10px;
+    }
+
+    select {
+      padding: 5px;
+    }
+  }
 
   .dnd {
     display: flex;

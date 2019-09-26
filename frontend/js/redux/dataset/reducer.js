@@ -22,6 +22,7 @@ const INITIAL_STATE = new Immutable.Record({
   predYCols: new Immutable.OrderedSet(),
   quantitativeXCols: new Immutable.OrderedSet(),
   qualitativeXCols: new Immutable.OrderedSet(),
+  isRegression: null,
 });
 
 const DatasetReducer = handleActions(
@@ -37,6 +38,7 @@ const DatasetReducer = handleActions(
         predYCols: new Immutable.OrderedSet(payload.predYCols),
         quantitativeXCols: new Immutable.OrderedSet(payload.quantitativeXCols),
         qualitativeXCols: new Immutable.OrderedSet(payload.qualitativeXCols),
+        isRegression: payload.isRegression,
       });
     },
   },

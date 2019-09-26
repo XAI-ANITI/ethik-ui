@@ -2,7 +2,6 @@ import React, { useState, useCallback } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import FontAwesome from "react-fontawesome";
-import Select from "react-select"; // TODO
 import { OrderedSet, Map } from "immutable";
 import { DndProvider } from "react-dnd";
 import HTML5Backend from "react-dnd-html5-backend";
@@ -15,6 +14,7 @@ import { getColumns } from "../../redux/dataset/selectors";
 
 function Configure(props) {
   const [isChecking, setIsChecking] = useState(false);
+  const [isRegression, setIsRegression] = useState(false);
   const [columns, setColumns] = useState(new Map({
     "excluded": new OrderedSet(),
     "categorical": new OrderedSet(),
@@ -22,6 +22,11 @@ function Configure(props) {
     "predicted": new OrderedSet([props.columns.last()]),
     "true": null,
   }));
+
+  const handleProblemTypeChange = (e) => {
+    // TODO: if regression, we can have one predicted column only
+    setIsRegression(event.target.value);
+  };
 
   const renderDustbin = (name, title) => {
     if (title === undefined) {
@@ -75,6 +80,7 @@ function Configure(props) {
         predYCols: cols.pred_y_cols,
         quantitativeXCols: cols.quantitative_x_cols,
         qualitativeXCols: cols.qualitative_x_cols,
+        isRegression: isRegression,
       });
     })
     .catch(function (e) {
@@ -152,6 +158,13 @@ function Configure(props) {
           {renderDustbinGroup("Excluded", ["excluded"], "excluded")} 
           {renderDustbinGroup("X", ["numeric", "categorical"])} 
           {renderDustbinGroup("y", ["predicted", "true"])} 
+        </div>
+        <div className="problem_type">
+          <label>Problem type:</label>
+          <select value={isRegression} onChange={handleProblemTypeChange}>
+              <option value={false}>classification</option>
+              <option value={true}>regression</option>
+          </select>
         </div>
         <input type="submit" value="Explain" />
       </form>

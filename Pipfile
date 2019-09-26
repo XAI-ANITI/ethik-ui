@@ -11,3 +11,4 @@ pandas = "*"
 scikit-learn = "*"
 colorlover = "*"
 ethik = {editable = true,git = "git@github.com/MaxHalford/ethik.git"}
+ipywidgets = "*"

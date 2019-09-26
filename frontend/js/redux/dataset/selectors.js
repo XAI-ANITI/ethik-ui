@@ -24,13 +24,16 @@ export const getPredYCols = state =>
   state && state.dataset ? state.dataset.predYCols : new OrderedSet();
 
 export const getQuantitativeXCols = state =>
-  state && state.dataset ? state.dataset.quantitativeXCols: new OrderedSet();
+  state && state.dataset ? state.dataset.quantitativeXCols : new OrderedSet();
 
 export const getQualitativeXCols = state =>
-  state && state.dataset ? state.dataset.qualitativeXCols: new OrderedSet();
+  state && state.dataset ? state.dataset.qualitativeXCols : new OrderedSet();
 
 export const getFeaturesCols = state =>
   getQuantitativeXCols(state).union(getQuantitativeXCols(state));
+
+export const isRegression = state =>
+  state && state.dataset ? state.dataset.isRegression : false;
 
 export const getAllowedExplanationViews = state => {
   if (!state || !state.dataset) return new Map();

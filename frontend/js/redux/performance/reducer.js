@@ -7,7 +7,8 @@ import {
   getQualitativeXCols,
   getPredYCols,
   getTrueYCol,
-  getFile
+  getFile,
+  isRegression
 } from "../dataset/selectors"; 
 
 const _loadPlots = createAction("PERFORMANCE/LOAD_PLOTS");
@@ -20,6 +21,7 @@ export const view = (payload) => {
     const qualitativeFeatures = getQualitativeXCols(state).toArray();
     const predLabels = getPredYCols(state).toArray();
     const trueLabel = getTrueYCol(state);
+    const isRegression_ = isRegression(state);
 
     if (!trueLabel) {
       return;
@@ -49,6 +51,9 @@ export const view = (payload) => {
       [JSON.stringify(qualitativeFeatures)],
       { type: "application/json" }
     ));
+    if (isRegression_) {
+      form.append("is_regression", "");
+    }
 
     API.post("plot_performance", form)
     .then(

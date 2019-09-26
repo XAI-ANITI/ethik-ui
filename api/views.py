@@ -68,40 +68,41 @@ def check_dataset(request):
     return JsonResponse(dict(errors=errors))
 
 
-def explain_bias(f, quantitative_cols, qualitative_cols, pred_y_cols):
+def parse_plot_request(request):
+    f = request.FILES["file"]
+    quantitative_cols = request.FILES["quantitative_cols"]
+    qualitative_cols = request.FILES["qualitative_cols"]
+    pred_y_cols = request.FILES["pred_y_cols"]
+    true_y_col = request.POST.get("true_y_col")
+    is_regression = "is_regression" in request.POST
+
+    quantitative_cols = json.loads(quantitative_cols.read().decode())
+    qualitative_cols = json.loads(qualitative_cols.read().decode())
+    pred_y_cols = json.loads(pred_y_cols.read().decode())
+
     # TODO: check args (see check_dataset())
     data = read_ds(f, qualitative_cols)
-    X = data.loc[:, [*quantitative_cols, *qualitative_cols]]
-    y_pred = data[pred_y_cols]
-    explainer = ethik.Explainer(n_samples=N_SAMPLES)
+    X_test = data.loc[:, [*quantitative_cols, *qualitative_cols]]
+    y_pred = pd.DataFrame(data[pred_y_cols])
+    y_test = None if true_y_col is None else data[true_y_col]
+    return is_regression, X_test, y_pred, y_test
 
-    return (
-        explainer,
-        explainer.explain_bias(X, y_pred),
-        explainer.rank_by_bias(X, y_pred)
-    )
+
+def init_explainer(is_regression):
+    cls = ethik.RegressionExplainer if is_regression else ethik.ClassificationExplainer
+    return cls(n_samples=N_SAMPLES, memoize=True)
 
 
 def plot_bias(request):
     try:
-        f = request.FILES["file"]
-        quantitative_cols = request.FILES["quantitative_cols"]
-        qualitative_cols = request.FILES["qualitative_cols"]
-        pred_y_cols = request.FILES["pred_y_cols"]
+        is_regression, X_test, y_pred, _ = parse_plot_request(request)
     except KeyError as e:
         return HttpResponseBadRequest(f"Cannot find key '{e}'")
-
-    try:
-        quantitative_cols = json.loads(quantitative_cols.read().decode())
-        qualitative_cols = json.loads(qualitative_cols.read().decode())
-        pred_y_cols = json.loads(pred_y_cols.read().decode())
     except json.decoder.JSONDecodeError as e:
         return HttpResponseBadRequest(e)
 
-    try:
-        explainer, bias, ranking = explain_bias(f, quantitative_cols, qualitative_cols, pred_y_cols)
-    except ValueError as e:
-        return HttpResponseBadRequest(e)
+    explainer = init_explainer(is_regression)
+    ranking = explainer.rank_by_bias(X_test, y_pred)
 
     labels = ranking["label"].unique()
     resp = {}
@@ -115,18 +116,23 @@ def plot_bias(request):
             for feat, color in zip(sorted_features, colors)
         }
         
-        feat_figures = explainer.make_bias_fig(
-            bias.query(f"label == '{label}'"),
-            with_taus=False,
+        # TODO: X_test has a "gender" column but we want "gender_male" and "gender_female"
+        feat_figures = {
+            feat: explainer.plot_bias(
+                X_test=X_test[feat],
+                y_pred=y_pred[label],
+                colors=feat_to_color,
+            )
+            for feat in X_test.columns 
+        }
+        tau_figure = explainer.plot_bias(
+            X_test=X_test,
+            y_pred=y_pred[label],
             colors=feat_to_color,
         )
-        tau_figure = explainer.make_bias_fig(
-            bias.query(f"label == '{label}'"),
-            with_taus=True,
-            colors=feat_to_color,
-        )
-        ranking_figure = explainer.make_bias_ranking_fig(
-            ranking.query(f"label == '{label}'"),
+        ranking_figure = explainer.plot_bias_ranking(
+            X_test=X_test,
+            y_pred=y_pred[label],
             colors=colors
         )
 
@@ -142,55 +148,22 @@ def plot_bias(request):
     return JsonResponse(resp)
 
 
-def explain_performance(f, quantitative_cols, qualitative_cols, pred_y_cols, true_y_col):
-    # TODO: check args (see check_dataset())
-    data = read_ds(f, qualitative_cols)
-    X = data.loc[:, [*quantitative_cols, *qualitative_cols]]
-    y_pred = data[pred_y_cols]
-    y_true = data[true_y_col]
-    explainer = ethik.Explainer(n_samples=N_SAMPLES)
-    
-    # For accuracy only
-    if len(pred_y_cols) > 1: 
+def plot_performance(request):
+    try:
+        is_regression, X_test, y_pred, y_test = parse_plot_request(request)
+    except KeyError as e:
+        return HttpResponseBadRequest(f"Cannot find key '{e}'")
+    except json.decoder.JSONDecodeError as e:
+        return HttpResponseBadRequest(e)
+
+    # For accuracy_score()
+    if len(y_pred.columns) > 1: 
         y_pred = y_pred.idxmax(axis="columns")
     else:
         y_pred = (y_pred > 0.5).astype(int)
 
-    return (
-        explainer,
-        explainer.explain_performance(X, y_true, y_pred, METRIC),
-        explainer.rank_by_performance(X, y_true, y_pred, METRIC)
-    )
-
-
-def plot_performance(request):
-    try:
-        f = request.FILES["file"]
-        quantitative_cols = request.FILES["quantitative_cols"]
-        qualitative_cols = request.FILES["qualitative_cols"]
-        pred_y_cols = request.FILES["pred_y_cols"]
-        true_y_col = request.POST["true_y_col"]
-    except KeyError as e:
-        return HttpResponseBadRequest(f"Cannot find key '{e}'")
-
-    try:
-        quantitative_cols = json.loads(quantitative_cols.read().decode())
-        qualitative_cols = json.loads(qualitative_cols.read().decode())
-        pred_y_cols = json.loads(pred_y_cols.read().decode())
-    except json.decoder.JSONDecodeError as e:
-        return HttpResponseBadRequest(e)
-
-    try:
-        explainer, performance, ranking = explain_performance(
-            f,
-            quantitative_cols,
-            qualitative_cols,
-            pred_y_cols,
-            true_y_col
-        )
-    except ValueError as e:
-        raise e
-        return HttpResponseBadRequest(e)
+    explainer = init_explainer(is_regression)
+    ranking = explainer.rank_by_performance(X_test, y_test, y_pred, METRIC)
     
     ranking_criterion = "min"
     sorted_features = ranking.sort_values(
@@ -202,20 +175,28 @@ def plot_performance(request):
         for feat, color in zip(sorted_features, colors)
     }
     
-    feat_figures = explainer.make_performance_fig(
-        performance,
-        with_taus=False,
+    # TODO: X_test has a "gender" column but we want "gender_male" and "gender_female"
+    feat_figures = {
+        feat: explainer.plot_performance(
+            X_test[feat],
+            y_test,
+            y_pred,
+            colors=feat_to_color,
+            metric=METRIC,
+        )
+        for feat in X_test.columns 
+    }
+    tau_figure = explainer.plot_performance(
+        X_test,
+        y_test,
+        y_pred,
         colors=feat_to_color,
         metric=METRIC,
     )
-    tau_figure = explainer.make_performance_fig(
-        performance,
-        with_taus=True,
-        colors=feat_to_color,
-        metric=METRIC,
-    )
-    ranking_figure = explainer.make_performance_ranking_fig(
-        ranking,
+    ranking_figure = explainer.plot_performance_ranking(
+        X_test,
+        y_test,
+        y_pred,
         metric=METRIC,
         criterion=ranking_criterion,
         colors=colors,
