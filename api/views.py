@@ -68,16 +68,20 @@ def check_dataset(request):
     return JsonResponse(dict(errors=errors))
 
 
+def get_features_from_request(request):
+    return (
+        json.loads(request.FILES["quantitative_cols"].read().decode()),
+        json.loads(request.FILES["qualitative_cols"].read().decode())
+    )
+
+
 def parse_plot_request(request):
     f = request.FILES["file"]
-    quantitative_cols = request.FILES["quantitative_cols"]
-    qualitative_cols = request.FILES["qualitative_cols"]
     pred_y_cols = request.FILES["pred_y_cols"]
     true_y_col = request.POST.get("true_y_col")
     is_regression = "is_regression" in request.POST
 
-    quantitative_cols = json.loads(quantitative_cols.read().decode())
-    qualitative_cols = json.loads(qualitative_cols.read().decode())
+    quantitative_cols, qualitative_cols = get_features_from_request(request)
     pred_y_cols = json.loads(pred_y_cols.read().decode())
 
     # TODO: check args (see check_dataset())
@@ -85,7 +89,7 @@ def parse_plot_request(request):
     X_test = data.loc[:, [*quantitative_cols, *qualitative_cols]]
     y_pred = pd.DataFrame(data[pred_y_cols])
     y_test = None if true_y_col is None else data[true_y_col]
-    return is_regression, X_test, y_pred, y_test
+    return is_regression, X_test, y_pred, y_test, qualitative_cols
 
 
 def init_explainer(is_regression):
@@ -95,7 +99,7 @@ def init_explainer(is_regression):
 
 def plot_bias(request):
     try:
-        is_regression, X_test, y_pred, _ = parse_plot_request(request)
+        is_regression, X_test, y_pred, _, qualitative_cols = parse_plot_request(request)
     except KeyError as e:
         return HttpResponseBadRequest(f"Cannot find key '{e}'")
     except json.decoder.JSONDecodeError as e:
@@ -116,15 +120,25 @@ def plot_bias(request):
             for feat, color in zip(sorted_features, colors)
         }
         
-        # TODO: X_test has a "gender" column but we want "gender_male" and "gender_female"
-        feat_figures = {
-            feat: explainer.plot_bias(
-                X_test=X_test[feat],
-                y_pred=y_pred[label],
-                colors=feat_to_color,
-            )
-            for feat in X_test.columns 
-        }
+        feat_figures = {}
+        for feat in X_test.columns:
+            if feat not in qualitative_cols:
+                feat_figures[feat] = explainer.plot_bias(
+                    X_test=X_test[feat],
+                    y_pred=y_pred[label],
+                    colors=feat_to_color,
+                )
+                continue
+
+            dummies = pd.get_dummies(X_test[feat])
+            for cat in dummies:
+                name = f"{feat} = {cat}"
+                feat_figures[name] = explainer.plot_bias(
+                    X_test=dummies[cat].rename(name),
+                    y_pred=y_pred[label],
+                    colors=feat_to_color,
+                )
+
         tau_figure = explainer.plot_bias(
             X_test=X_test,
             y_pred=y_pred[label],
@@ -150,7 +164,7 @@ def plot_bias(request):
 
 def plot_performance(request):
     try:
-        is_regression, X_test, y_pred, y_test = parse_plot_request(request)
+        is_regression, X_test, y_pred, y_test, qualitative_cols = parse_plot_request(request)
     except KeyError as e:
         return HttpResponseBadRequest(f"Cannot find key '{e}'")
     except json.decoder.JSONDecodeError as e:
@@ -175,17 +189,29 @@ def plot_performance(request):
         for feat, color in zip(sorted_features, colors)
     }
     
-    # TODO: X_test has a "gender" column but we want "gender_male" and "gender_female"
-    feat_figures = {
-        feat: explainer.plot_performance(
-            X_test[feat],
-            y_test,
-            y_pred,
-            colors=feat_to_color,
-            metric=METRIC,
-        )
-        for feat in X_test.columns 
-    }
+    feat_figures = {}
+    for feat in X_test.columns:
+        if feat not in qualitative_cols:
+            feat_figures[feat] = explainer.plot_performance(
+                X_test=X_test[feat],
+                y_test=y_test,
+                y_pred=y_pred,
+                metric=METRIC,
+                colors=feat_to_color,
+            )
+            continue
+
+        dummies = pd.get_dummies(X_test[feat])
+        for cat in dummies:
+            name = f"{feat} = {cat}"
+            feat_figures[name] = explainer.plot_performance(
+                X_test=dummies[cat].rename(name),
+                y_test=y_test,
+                y_pred=y_pred,
+                metric=METRIC,
+                colors=feat_to_color,
+            )
+
     tau_figure = explainer.plot_performance(
         X_test,
         y_test,
