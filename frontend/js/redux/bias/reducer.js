@@ -51,7 +51,7 @@ export const view = (payload) => {
       form.append("is_regression", "");
     }
 
-    API.post("plot_bias", form)
+    API.post("plot_influence", form)
     .then(
       (res) => dispatch(_loadPlots({ plots: res.data }))
     )

@@ -97,7 +97,7 @@ def init_explainer(is_regression):
     return cls(n_samples=N_SAMPLES, memoize=True)
 
 
-def plot_bias(request):
+def plot_influence(request):
     try:
         is_regression, X_test, y_pred, _, qualitative_cols = parse_plot_request(request)
     except KeyError as e:
@@ -106,7 +106,7 @@ def plot_bias(request):
         return HttpResponseBadRequest(e)
 
     explainer = init_explainer(is_regression)
-    ranking = explainer.rank_by_bias(X_test, y_pred)
+    ranking = explainer.rank_by_influence(X_test, y_pred)
 
     labels = ranking["label"].unique()
     resp = {}
@@ -123,7 +123,7 @@ def plot_bias(request):
         feat_figures = {}
         for feat in X_test.columns:
             if feat not in qualitative_cols:
-                feat_figures[feat] = explainer.plot_bias(
+                feat_figures[feat] = explainer.plot_influence(
                     X_test=X_test[feat],
                     y_pred=y_pred[label],
                     colors=feat_to_color,
@@ -133,18 +133,18 @@ def plot_bias(request):
             dummies = pd.get_dummies(X_test[feat])
             for cat in dummies:
                 name = f"{feat} = {cat}"
-                feat_figures[name] = explainer.plot_bias(
+                feat_figures[name] = explainer.plot_influence(
                     X_test=dummies[cat].rename(name),
                     y_pred=y_pred[label],
                     colors=feat_to_color,
                 )
 
-        tau_figure = explainer.plot_bias(
+        tau_figure = explainer.plot_influence(
             X_test=X_test,
             y_pred=y_pred[label],
             colors=feat_to_color,
         )
-        ranking_figure = explainer.plot_bias_ranking(
+        ranking_figure = explainer.plot_influence_ranking(
             X_test=X_test,
             y_pred=y_pred[label],
             colors=colors
