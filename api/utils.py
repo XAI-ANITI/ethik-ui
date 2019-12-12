@@ -18,11 +18,9 @@ def read_ds(f, cat_features):
 
 def fig_to_json(fig):
     convert = lambda obj: json.loads(json.dumps(obj, cls=PlotlyJSONEncoder))
-    layout = convert(fig.layout)
-    layout.pop("template", None)
     return dict(
         data=convert(fig.data),
-        layout=layout,
+        layout=convert(fig.layout),
     )
 
 
