@@ -15,8 +15,8 @@ npm install
 ## Dev
 
 ```
-npm run dev  # Build the static files from JSX files
-pipenv run python manage.py runserver  # Start the development server
+make front_dev # Build the static files from JSX files
+make back_dev # Start the development server
 ```
 
 ## Folders
