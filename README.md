@@ -4,7 +4,10 @@
 
 **Requires Python 3.6+**
 
-```
+```bash
+git clone https://github.com/XAI-ANITI/ethik-ui.git
+cd ethik-ui
+# In a Python virtualenv:
 make install
 ```
 
