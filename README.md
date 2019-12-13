@@ -2,26 +2,42 @@
 
 ## Install
 
-**Requires Python 3.6+**
+**Requires Python 3.6+ and npm 6+**
 
 ```bash
 git clone https://github.com/XAI-ANITI/ethik-ui.git
 cd ethik-ui
-# In a Python virtualenv:
+# (In a Python virtualenv:)
+python -V  # Must be greater than 3.6
+npm -v  # Must be greater than 6.0
 make install
 ```
 
-## Dev
+## Run
+
+Build the static files from JSX files:
 
 ```
-make front_dev # Build the static files from JSX files
-make back_dev # Start the development server
+make front_dev
 ```
 
-## Folders
+Start the Django development server:
+
+```
+make back_dev
+```
+
+There are well-formatted datasets in `data` that can be loaded from the interface.
+
+## Code structure
+
+The code is a Django project with two apps: `api` and `frontend`. `api` just
+defines views to receive requests that call `ethik` features. `frontend` is a
+ReactJS app that builds static files served by Django.
 
 ```
 api/: A Django app for back-end
+data/: Datasets that can be loaded from the web interface
 ethik_ui/: The Django project
 frontend/: A Django app for frontend
   js/: JSX files
