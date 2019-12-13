@@ -2,4 +2,4 @@ colorlover==0.3.0
 Django==3.0
 pandas==0.25.3
 scikit-learn==0.22
-ethik
+-e git+https://github.com/XAI-ANITI/ethik#egg=ethik

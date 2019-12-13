@@ -5,11 +5,7 @@
 **Requires Python 3.6+**
 
 ```
-pip install -r requirements.txt
-```
-
-```
-npm install
+make install
 ```
 
 ## Dev

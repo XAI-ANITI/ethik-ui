@@ -3,3 +3,7 @@ back_dev:
 
 front_dev:
 	npm run dev
+
+install:
+	pip install -r requirements.txt
+	npm install
