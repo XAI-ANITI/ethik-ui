@@ -1,5 +1,5 @@
 colorlover==0.3.0
-Django==3.0
+Django==3.1.6
 pandas==0.25.3
 scikit-learn==0.22
 ethik==0.0.4
